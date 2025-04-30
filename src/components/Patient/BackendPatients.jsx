@@ -33,6 +33,7 @@ import Button from '@mui/material/Button';
 
 const drawerWidth = 240;
 const defaultTheme = createTheme();
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -79,7 +80,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-export default function AllPatients() {
+export default function AllPatients(){
   const [open, setOpen] = useState(false);
   const [patients, setPatients] = useState([]);
   const [page, setPage] = useState(0);
@@ -100,7 +101,7 @@ export default function AllPatients() {
       try {
         setPatients([]); // Clear the previous patients
 
-        let url = 'http://115.146.84.144/patients/';
+        let url = `${BASE_URL}/patients/`;
         if (projectId) {
           url += `?project_id=${projectId}`;
         }

@@ -34,6 +34,7 @@ import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 
 const drawerWidth = 240;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -122,7 +123,7 @@ export default function BackendProjects() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch('http://115.146.84.144/projects/');
+        const response = await fetch(`${BASE_URL}/projects/`);
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }

@@ -33,6 +33,7 @@ import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 
 const drawerWidth = 240;
 const defaultTheme = createTheme();
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -99,7 +100,7 @@ export default function AllDatasets() {
   useEffect(() => {
     const fetchDatasets = async () => {
       try {
-        let url = 'http://115.146.84.144/datasets/';
+        let url = `${BASE_URL}/projects/`;
         if (projectId) {
           url += `?project_id=${projectId}`;
         }

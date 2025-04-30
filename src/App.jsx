@@ -18,6 +18,9 @@ import SingleProjectPage from './pages/ProjectPage/SingleProjectPage';
 import Visualization from './pages/Visualization'
 
 import ProtectedRoute from './components/ProtectedRoute';
+import { UploadPage } from './pages/UploadPage'
+import ProjectSummary from './pages/ProjectSumaryPage'
+import DatasetDetailsPage from './pages/DatasetPage/DatasetDetailsPage'
 
 function App() {
 
@@ -69,6 +72,24 @@ function App() {
           }
         />
         
+        <Route
+          path="/upload"
+          element={
+            <ProtectedRoute>
+              <UploadPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/projectsummary"
+          element={
+            <ProtectedRoute>
+              <ProjectSummary />
+            </ProtectedRoute>
+          }
+        />
+
         {/* Single Page */}
         <Route
           path="/dataset/:id"
@@ -91,6 +112,15 @@ function App() {
           element={
             <ProtectedRoute>
               <SingleProjectPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dataset/details/:id"
+          element={
+            <ProtectedRoute>
+              <DatasetDetailsPage />
             </ProtectedRoute>
           }
         />

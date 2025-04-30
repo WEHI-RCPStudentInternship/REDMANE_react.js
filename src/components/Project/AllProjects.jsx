@@ -34,7 +34,6 @@ import TablePagination from '@mui/material/TablePagination';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../actions/authActions'
 
-
 // Generate Order Data, this will be replaced with data from the backend
 function createData(id, pId, date, name, status) {
   return { id, pId, date, name, status};
@@ -344,3 +343,4 @@ export default function AllProjects() {
     </ThemeProvider>
   );
 }
+
