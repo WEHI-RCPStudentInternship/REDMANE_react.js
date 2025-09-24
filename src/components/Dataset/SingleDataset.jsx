@@ -3,7 +3,7 @@ import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
@@ -119,8 +119,9 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export default function AllDatasets() {
-    
+export default function SingleDataset() {
+  
+  const [newFileOpen, setNewFileOpen] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -164,6 +165,11 @@ export default function AllDatasets() {
       .catch(err => console.error("Failed to copy:", err));
   };
 
+  // Update Data Registry button
+  const handleUpdateRegistry = () => {
+    console.log("handle");
+  }
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -181,6 +187,14 @@ export default function AllDatasets() {
   const handleClosePop = () => {
     setOpen(false);
   };
+
+  const handleOpenNewFile = () => {
+    setNewFileOpen(true);
+  };
+
+  const handleCloseNewFile = () => {
+    setNewFileOpen(false);
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -304,6 +318,9 @@ export default function AllDatasets() {
                         <Typography variant="body1">
                           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vehicula, mauris eget ullamcorper pellentesque, risus dolor consequat ligula, a dictum lacus odio at odio. Integer cursus dui at libero hendrerit, vitae auctor metus tempus. Duis facilisis justo ut orci varius, at molestie metus sollicitudin. Nunc accumsan, lorem eget luctus euismod, metus augue facilisis libero, eget egestas lectus libero eget magna.
                         </Typography>
+                        <Button variant='outlined' sx={{ mr: 2, mt: 7 }} onClick={handleOpenNewFile}>
+                          Update Data Registry
+                        </Button>
                     </Paper>
                     </Grid>
 
@@ -372,6 +389,29 @@ export default function AllDatasets() {
 
         </Box>
       </Box>
+
+      <Dialog open={newFileOpen} onClose={handleCloseNewFile}>
+        <DialogTitle variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center', py: 4}}>
+          How to update Data Registry
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText variant="body1" sx={{color: 'black'}}>
+            Go to WEHI Milton /vast/projects/TDE/TDE0005
+            <br/><br/>
+            You will need to run the update_local.sh script on the command line.
+            <br/><br/>
+            This will create an output.html and output.json file.
+            <br/><br/>
+            Once you run the script, please review the output.html file.
+            <br/><br/>
+            Once you are satisfied that the html file is OK, click on the button below to upload output.json. You can also use
+            update_data_registry.sh to upload the output.json file
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'flex-start', pl: 3, pb: 5}}>
+          <Button variant="outlined" onClick={handleUpdateRegistry} >Upload output.json file</Button>
+        </DialogActions>
+      </Dialog>
     </ThemeProvider>
   );
 }
