@@ -108,14 +108,13 @@ function App() {
           }
         />
         <Route
-          path="/project/:id"
+          path="/project/:projectId"
           element={
             <ProtectedRoute>
               <SingleProjectPage />
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dataset/details/:id"
           element={

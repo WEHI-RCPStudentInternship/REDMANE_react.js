@@ -103,6 +103,10 @@ export default function BackendProjects() {
     navigate('/login');
   };
 
+  const handleViewSummary = (projectId) => {
+    navigate(`/project/${projectId}`);
+  };
+
   const handleViewDatasets = (projectId) => {
     navigate(`/datasets?project_id=${projectId}`);
   };
@@ -228,6 +232,7 @@ export default function BackendProjects() {
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Date Created</TableCell>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Name</TableCell>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Summary</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Datasets</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Patients</TableCell>
                         </TableRow>
@@ -242,6 +247,17 @@ export default function BackendProjects() {
                             <TableCell align="right">
                                 <Button
                                 variant="contained"
+                                color="info"
+                                size="small"
+                                onClick={() => handleViewSummary(project.id)}
+                                sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
+                                >
+                                View Summary
+                                </Button>
+                            </TableCell>
+                            <TableCell align="right">
+                                <Button
+                                variant="contained"
                                 color="primary"
                                 size="small"
                                 onClick={() => handleViewDatasets(project.id)}
@@ -253,7 +269,7 @@ export default function BackendProjects() {
                             <TableCell align="right">
                                 <Button
                                 variant="contained"
-                                color="secondary"
+                                color="success"
                                 size="small"
                                 onClick={() => handleViewPatients(project.id)}
                                 sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
