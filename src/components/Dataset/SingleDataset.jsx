@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useRef } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -33,6 +34,8 @@ import dataset from '../../assets/testjson/output.json';
 function createData(id, dId, date, name, source) {
     return { id, dId, date, name, source};
 }
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const rows = [
     createData(5, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
@@ -120,12 +123,17 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function SingleDataset() {
-  
+    
   const [newFileOpen, setNewFileOpen] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  const fileInputRef = useRef(null);
   
   const rawDataLocation = dataset.data.location; // Extract base path
   const rawFiles = dataset.data.files.raw.map(file => file.directory); // Extract file paths without extra quotes
@@ -165,9 +173,50 @@ export default function SingleDataset() {
       .catch(err => console.error("Failed to copy:", err));
   };
 
-  // Update Data Registry button
-  const handleUpdateRegistry = () => {
-    console.log("handle");
+  const handleFileChangeAndUpload = async (event) => {
+    const file = event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    setSelectedFile(file);
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+
+    try {
+      const res = await fetch(`${BASE_URL}/ingest/upload_file_metadata`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || 'Upload failed');
+      }
+
+      const result = await res.json();
+      setUploadSuccess(true);
+
+    } catch (err) {
+      alert(`Error: ${error.message}`);
+    } finally {
+      event.target.value = null;
+    }
+  
+  }
+
+  const handleSelectFileClick = () => {
+    fileInputRef.current.click();
+  }
+
+  const handleCloseNewFile = () => {
+    setNewFileOpen(false);
+
+    setTimeout(() => {
+      setSelectedFile(null);
+      setUploadSuccess(false);
+    }, 300)
   }
 
   const dispatch = useDispatch();
@@ -192,7 +241,7 @@ export default function SingleDataset() {
     setNewFileOpen(true);
   };
 
-  const handleCloseNewFile = () => {
+  const handleCloseUpdate = () => {
     setNewFileOpen(false);
   }
 
@@ -390,7 +439,7 @@ export default function SingleDataset() {
         </Box>
       </Box>
 
-      <Dialog open={newFileOpen} onClose={handleCloseNewFile}>
+      <Dialog open={newFileOpen} onClose={handleCloseUpdate}>
         <DialogTitle variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center', py: 4}}>
           How to update Data Registry
         </DialogTitle>
@@ -398,7 +447,7 @@ export default function SingleDataset() {
           <DialogContentText variant="body1" sx={{color: 'black'}}>
             Go to WEHI Milton /vast/projects/TDE/TDE0005
             <br/><br/>
-            You will need to run the update_local.sh script on the command line.
+            You will need to run the update_local.sh script on the command line. <a href="https://github.com/lara-pawar/REDMANE-metadata-generator-with-RO-Crate" target='_blank'>[Click here if you need help]</a>
             <br/><br/>
             This will create an output.html and output.json file.
             <br/><br/>
@@ -407,10 +456,20 @@ export default function SingleDataset() {
             Once you are satisfied that the html file is OK, click on the button below to upload output.json. You can also use
             update_data_registry.sh to upload the output.json file
           </DialogContentText>
+
+          <input
+            type='file'
+            accept='.json'
+            hidden
+            ref={fileInputRef}
+            onChange={handleFileChangeAndUpload}
+          />
+
+          <Box>
+            <Button variant="outlined" onClick={handleSelectFileClick} sx={{ mt: 3, mb: 2 }} >Upload output.json file</Button>
+          </Box>
+
         </DialogContent>
-        <DialogActions sx={{ justifyContent: 'flex-start', pl: 3, pb: 5}}>
-          <Button variant="outlined" onClick={handleUpdateRegistry} >Upload output.json file</Button>
-        </DialogActions>
       </Dialog>
     </ThemeProvider>
   );
