@@ -31,7 +31,7 @@ import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 
 const drawerWidth = 240;
-const BASE_URL = import.meta.env.VITE_API_BASE_URL; // reserved for real fetches later
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -78,6 +78,29 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const defaultTheme = createTheme();
 
+/* ----------------------------- Size helpers ----------------------------- */
+// Extract size (bytes) from API objects that may contain `total_size_bytes`
+// or (older) `total_size_kb`.
+const getBytes = (obj) => {
+  if (!obj) return 0;
+  if (typeof obj.total_size_bytes === 'number') return obj.total_size_bytes;
+  if (typeof obj.total_size_kb === 'number') return obj.total_size_kb * 1024;
+  return 0;
+};
+
+// Format bytes with sensible units so small values don’t show as 0.0 GB.
+const formatSmartSize = (bytes) => {
+  if (!bytes || bytes <= 0) return '0 B';
+  const KB = 1024;
+  const MB = KB * 1024;
+  const GB = MB * 1024;
+
+  if (bytes >= GB) return `${(bytes / GB).toFixed(2)} GB`;    // 2 dp in GB
+  if (bytes >= MB) return `${(bytes / MB).toFixed(1)} MB`;    // 1 dp in MB
+  return `${(bytes / KB).toFixed(0)} KB`;                     // integer KB
+};
+/* ----------------------------------------------------------------------- */
+
 export default function SingleProjectPage() {
   const [open, setOpen] = React.useState(false);
   const toggleDrawer = () => setOpen(!open);
@@ -87,39 +110,43 @@ export default function SingleProjectPage() {
   const { projectId } = useParams();
   const id = Number(projectId);
 
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(null);
+  const [summary, setSummary] = React.useState(null); // { project_id, project_name, totals, datasets[] }
+
+  React.useEffect(() => {
+    let mounted = true;
+    async function run() {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await fetch(`${BASE_URL}/projects/${id}/summary`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (mounted) setSummary(data);
+      } catch (e) {
+        if (mounted) setError(e.message || 'Failed to load summary');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+    if (!Number.isNaN(id)) run();
+    return () => { mounted = false; };
+  }, [id]);
+
   const handleLogout = () => {
     dispatch(logout());
     navigate('/login');
   };
 
-  const projectName = `Project ${id}`;
-
-  // Dummy dataset summary rows
-  const rows = [
-    { datasetName: 'WGS Cohort A',   files: 120, patients: 45, samples: 68, size: '92.4 GB' },
-    { datasetName: 'RNA-Seq Pilot',  files: 36,  patients: 12, samples: 24, size: '18.1 GB' },
-    { datasetName: 'Clinical Forms', files: 12,  patients: 50, samples: 0,  size: '2.5 GB'  },
-  ];
-
-  // Totals (assumes GB units in dummy data)
-  const totals = rows.reduce(
-    (acc, r) => {
-      acc.files += r.files;
-      acc.patients += r.patients;
-      acc.samples += r.samples;
-      const n = parseFloat(String(r.size).replace(/[^\d.]/g, '')) || 0;
-      acc.sizeGB += n;
-      return acc;
-    },
-    { files: 0, patients: 0, samples: 0, sizeGB: 0 }
-  );
+  const projectTitle = summary?.project_name ? summary.project_name : `Project ${id}`;
 
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
         <CssBaseline />
 
-        {/* HEADER (same as projects page) */}
+        {/* HEADER */}
         <AppBar position="absolute" open={open}>
           <Toolbar sx={{ pr: '24px' }}>
             <IconButton
@@ -159,7 +186,7 @@ export default function SingleProjectPage() {
           </Toolbar>
         </AppBar>
 
-        {/* DRAWER (same) */}
+        {/* DRAWER */}
         <Drawer variant="permanent" open={open}>
           <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', px: [1] }}>
             <IconButton onClick={toggleDrawer}><ChevronLeftIcon /></IconButton>
@@ -187,72 +214,83 @@ export default function SingleProjectPage() {
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                {/* ONE white card: title + totals + table */}
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  {/* Project title */}
-                  <Title>{projectName}</Title>
+                  <Title>{projectTitle}</Title>
 
-                  {/* Totals row */}
-                  <Grid container spacing={2} sx={{ mt: 1, mb: 2 }}>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                        <CardContent>
-                          <Typography variant="overline" color="text.secondary">Total Files</Typography>
-                          <Typography variant="h5">{totals.files}</Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                        <CardContent>
-                          <Typography variant="overline" color="text.secondary">Total Patients</Typography>
-                          <Typography variant="h5">{totals.patients}</Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                        <CardContent>
-                          <Typography variant="overline" color="text.secondary">Total Samples</Typography>
-                          <Typography variant="h5">{totals.samples}</Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                      <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                        <CardContent>
-                          <Typography variant="overline" color="text.secondary">Total Size</Typography>
-                          <Typography variant="h5">{totals.sizeGB.toFixed(1)} GB</Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-                  </Grid>
+                  {loading && <Typography variant="h6" sx={{ my: 2 }}>Loading…</Typography>}
+                  {error && !loading && (
+                    <Typography variant="h6" color="error" sx={{ my: 2 }}>
+                      {error}
+                    </Typography>
+                  )}
 
-                  <Divider sx={{ mb: 1 }} />
+                  {!loading && !error && summary && (
+                    <>
+                      {/* Totals */}
+                      <Grid container spacing={2} sx={{ mt: 1, mb: 2 }}>
+                        <Grid item xs={12} sm={6} md={3}>
+                          <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+                            <CardContent>
+                              <Typography variant="overline" color="text.secondary">Total Files</Typography>
+                              <Typography variant="h5">{summary.totals.file_count}</Typography>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                          <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+                            <CardContent>
+                              <Typography variant="overline" color="text.secondary">Total Patients</Typography>
+                              <Typography variant="h5">{summary.totals.patient_count}</Typography>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                          <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+                            <CardContent>
+                              <Typography variant="overline" color="text.secondary">Total Samples</Typography>
+                              <Typography variant="h5">{summary.totals.sample_count}</Typography>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                        <Grid item xs={12} sm={6} md={3}>
+                          <Card elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+                            <CardContent>
+                              <Typography variant="overline" color="text.secondary">Total Size</Typography>
+                              <Typography variant="h5">
+                                {formatSmartSize(getBytes(summary.totals))}
+                              </Typography>
+                            </CardContent>
+                          </Card>
+                        </Grid>
+                      </Grid>
 
-                  {/* Dataset summary table */}
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Dataset Name</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>Number of Files</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>Number of Patients</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>Number of Samples</TableCell>
-                        <TableCell align="right" sx={{ fontWeight: 'bold' }}>File Size</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows.map((r, i) => (
-                        <TableRow key={i}>
-                          <TableCell>{r.datasetName}</TableCell>
-                          <TableCell align="right">{r.files}</TableCell>
-                          <TableCell align="right">{r.patients}</TableCell>
-                          <TableCell align="right">{r.samples}</TableCell>
-                          <TableCell align="right">{r.size}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                      <Divider sx={{ mb: 1 }} />
+
+                      {/* Dataset table */}
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Dataset Name</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>Number of Files</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>Number of Patients</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>Number of Samples</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>File Size</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {summary.datasets.map((d) => (
+                            <TableRow key={d.dataset_id}>
+                              <TableCell>{d.dataset_name}</TableCell>
+                              <TableCell align="right">{d.file_count}</TableCell>
+                              <TableCell align="right">{d.patient_count}</TableCell>
+                              <TableCell align="right">{d.sample_count}</TableCell>
+                              <TableCell align="right">{formatSmartSize(getBytes(d))}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </>
+                  )}
                 </Paper>
               </Grid>
             </Grid>
@@ -263,5 +301,6 @@ export default function SingleProjectPage() {
     </ThemeProvider>
   );
 }
+
 
 
