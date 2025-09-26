@@ -126,8 +126,7 @@ export default function SingleDataset() {
     
   const [newFileOpen, setNewFileOpen] = React.useState(false);
   const [open, setOpen] = React.useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('IDLE');
   
   const toggleDrawer = () => {
     setOpen(!open);
@@ -180,9 +179,8 @@ export default function SingleDataset() {
       return;
     }
 
-    setSelectedFile(file);
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    formData.append('file', file);
 
     try {
       const res = await fetch(`${BASE_URL}/ingest/upload_file_metadata`, {
@@ -196,10 +194,10 @@ export default function SingleDataset() {
       }
 
       const result = await res.json();
-      setUploadSuccess(true);
+      setUploadStatus("SUCCESS");
 
     } catch (err) {
-      alert(`Error: ${error.message}`);
+      setUploadStatus("ERROR");
     } finally {
       event.target.value = null;
     }
@@ -212,11 +210,10 @@ export default function SingleDataset() {
 
   const handleCloseNewFile = () => {
     setNewFileOpen(false);
+  }
 
-    setTimeout(() => {
-      setSelectedFile(null);
-      setUploadSuccess(false);
-    }, 300)
+  const handleResetDialog = () => {
+    setUploadStatus('IDLE');
   }
 
   const dispatch = useDispatch();
@@ -439,35 +436,74 @@ export default function SingleDataset() {
         </Box>
       </Box>
 
-      <Dialog open={newFileOpen} onClose={handleCloseUpdate}>
+      <Dialog open={newFileOpen} onClose={handleCloseUpdate} TransitionProps={{ onExited: handleResetDialog }}
+      fullWidth maxWidth='sm'>
         <DialogTitle variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center', py: 4}}>
-          How to update Data Registry
+          {uploadStatus === 'IDLE' && "How to update Data Registry"}
+          {uploadStatus === 'SUCCESS' && 'TDE0005 updated'}
+          {uploadStatus === 'ERROR' && 'Upload error'}
         </DialogTitle>
         <DialogContent>
-          <DialogContentText variant="body1" sx={{color: 'black'}}>
-            Go to WEHI Milton /vast/projects/TDE/TDE0005
-            <br/><br/>
-            You will need to run the update_local.sh script on the command line. <a href="https://github.com/lara-pawar/REDMANE-metadata-generator-with-RO-Crate" target='_blank'>[Click here if you need help]</a>
-            <br/><br/>
-            This will create an output.html and output.json file.
-            <br/><br/>
-            Once you run the script, please review the output.html file.
-            <br/><br/>
-            Once you are satisfied that the html file is OK, click on the button below to upload output.json. You can also use
-            update_data_registry.sh to upload the output.json file
-          </DialogContentText>
+          {uploadStatus === 'IDLE' && (
+            <>
+              <DialogContentText variant="body1" sx={{color: 'black'}}>
+                Go to WEHI Milton /vast/projects/TDE/TDE0005
+                <br/><br/>
+                You will need to run the update_local.sh script on the command line. <a href="https://github.com/lara-pawar/REDMANE-metadata-generator-with-RO-Crate" target='_blank'>[Click here if you need help]</a>
+                <br/><br/>
+                This will create an output.html and output.json file.
+                <br/><br/>
+                Once you run the script, please review the output.html file.
+                <br/><br/>
+                Once you are satisfied that the html file is OK, click on the button below to upload output.json. You can also use
+                update_data_registry.sh to upload the output.json file
+              </DialogContentText>
 
-          <input
-            type='file'
-            accept='.json'
-            hidden
-            ref={fileInputRef}
-            onChange={handleFileChangeAndUpload}
-          />
+              <input
+                type='file'
+                accept='.json'
+                hidden
+                ref={fileInputRef}
+                onChange={handleFileChangeAndUpload}
+              />
 
-          <Box>
-            <Button variant="outlined" onClick={handleSelectFileClick} sx={{ mt: 3, mb: 2 }} >Upload output.json file</Button>
-          </Box>
+              <Box>
+                <Button variant="outlined" onClick={handleSelectFileClick} sx={{ mt: 3, mb: 2 }} >Upload output.json file</Button>
+              </Box>
+            </>
+          )}
+
+          {uploadStatus === 'SUCCESS' && (
+            <>
+              <DialogContentText variant="body1" sx={{color: 'black'}}>
+                The Data Registry TDE0005 has been updated.
+                <br/><br/>
+                ... new raw files (*.fastq, *.fasta) were registed with ...
+                <br/><br/>
+                ... new raw files (*.fastq, *.fasta) were registed with ...
+                <br/><br/>
+                ... new raw files (*.fastq, *.fasta) were registed with ...
+                <br/><br/>
+                Receipt number is 78746776433
+              </DialogContentText>
+
+              <Box>
+                <Button variant="outlined" onClick={handleCloseNewFile} sx={{ mt: 3, mb: 2 }} >Close</Button>
+              </Box>
+            </>
+          )}
+
+          {uploadStatus === 'ERROR' && (
+            <>
+              <DialogContentText variant="body1" sx={{color: 'black'}}>
+                Error uploading file. Make sure you are selecting the correct output.json file.
+              </DialogContentText>
+
+              <Box>
+                <Button variant="outlined" onClick={handleCloseNewFile} sx={{ mt: 3, mb: 1 }} >Close</Button>
+              </Box>
+            </>
+          )}
 
         </DialogContent>
       </Dialog>
