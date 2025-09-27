@@ -124,8 +124,9 @@ const defaultTheme = createTheme();
 
 export default function SingleDataset() {
     
-  const [newFileOpen, setNewFileOpen] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
+  const [newFileOpen, setNewFileOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [slurmOpen, setSlurmOpen] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('IDLE');
   
   const toggleDrawer = () => {
@@ -226,12 +227,12 @@ export default function SingleDataset() {
 
   // Function to open the dialog
   const handleOpenPop = () => {
-    setOpen(true);
+    setSlurmOpen(true);
   };
 
   // Function to close the dialog
   const handleClosePop = () => {
-    setOpen(false);
+    setSlurmOpen(false);
   };
 
   const handleOpenNewFile = () => {
@@ -386,7 +387,7 @@ export default function SingleDataset() {
 
                         <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleOpenPop}>SLURM pre-processing</Button>
                         {/* Dialog (Popup) */}
-                        <Dialog open={open} onClose={handleClosePop} maxWidth="sm" fullWidth >
+                        <Dialog open={slurmOpen} onClose={handleClosePop} maxWidth="sm" fullWidth >
                           
                           <DialogContent>
                             <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
