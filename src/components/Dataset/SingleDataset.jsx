@@ -128,6 +128,7 @@ export default function SingleDataset() {
   const [open, setOpen] = useState(false);
   const [slurmOpen, setSlurmOpen] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('IDLE');
+  const [summary, setSummary] = useState(null);
   
   const toggleDrawer = () => {
     setOpen(!open);
@@ -189,12 +190,13 @@ export default function SingleDataset() {
         body: formData,
       })
 
+      const response = await res.json();
+
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.detail || 'Upload failed');
+        throw new Error(response.detail || 'Upload failed');
       }
 
-      const result = await res.json();
+      setSummary(response.summary);
       setUploadStatus("SUCCESS");
 
     } catch (err) {
@@ -215,6 +217,7 @@ export default function SingleDataset() {
 
   const handleResetDialog = () => {
     setUploadStatus('IDLE');
+    setSummary(null);
   }
 
   const dispatch = useDispatch();
@@ -468,8 +471,8 @@ export default function SingleDataset() {
                 onChange={handleFileChangeAndUpload}
               />
 
-              <Box>
-                <Button variant="outlined" onClick={handleSelectFileClick} sx={{ mt: 3, mb: 2 }} >Upload output.json file</Button>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Button variant="outlined" onClick={handleSelectFileClick} sx={{ mt: 3, mb: 2}} >Upload output.json file</Button>
               </Box>
             </>
           )}
@@ -479,16 +482,16 @@ export default function SingleDataset() {
               <DialogContentText variant="body1" sx={{color: 'black'}}>
                 The Data Registry TDE0005 has been updated.
                 <br/><br/>
-                ... new raw files (*.fastq, *.fasta) were registed with ...
+                {summary.raw_files.count} new raw files (*.fastq, *.fasta) were registed with {summary.raw_files.total_size}{summary.file_size_unit}
                 <br/><br/>
-                ... new raw files (*.fastq, *.fasta) were registed with ...
+                {summary.processed_files.count} new processed files (*.fastq, *.fasta) were registed with {summary.processed_files.total_size}{summary.file_size_unit}
                 <br/><br/>
-                ... new raw files (*.fastq, *.fasta) were registed with ...
+                {summary.summarised_files.count} new summarised files (*.fastq, *.fasta) were registed with {summary.summarised_files.total_size}{summary.file_size_unit}
                 <br/><br/>
                 Receipt number is 78746776433
               </DialogContentText>
 
-              <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Button variant="outlined" onClick={handleCloseNewFile} sx={{ mt: 3, mb: 2 }} >Close</Button>
               </Box>
             </>
@@ -500,7 +503,7 @@ export default function SingleDataset() {
                 Error uploading file. Make sure you are selecting the correct output.json file.
               </DialogContentText>
 
-              <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                 <Button variant="outlined" onClick={handleCloseNewFile} sx={{ mt: 3, mb: 1 }} >Close</Button>
               </Box>
             </>
