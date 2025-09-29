@@ -484,9 +484,9 @@ export default function SingleDataset() {
                 <br/><br/>
                 {summary.raw_files.count} new raw files (*.fastq, *.fasta) were registed with {summary.raw_files.total_size}{summary.file_size_unit}
                 <br/><br/>
-                {summary.processed_files.count} new processed files (*.fastq, *.fasta) were registed with {summary.processed_files.total_size}{summary.file_size_unit}
+                {summary.processed_files.count} new processed files (*.cram, *.bam) were registed with {summary.processed_files.total_size}{summary.file_size_unit}
                 <br/><br/>
-                {summary.summarised_files.count} new summarised files (*.fastq, *.fasta) were registed with {summary.summarised_files.total_size}{summary.file_size_unit}
+                {summary.summarised_files.count} new summarised files (*.vcf, *.maf) were registed with {summary.summarised_files.total_size}{summary.file_size_unit}
                 <br/><br/>
                 Receipt number is 78746776433
               </DialogContentText>
