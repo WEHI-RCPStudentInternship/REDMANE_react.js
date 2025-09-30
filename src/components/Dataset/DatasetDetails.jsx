@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -17,17 +17,19 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { mainListItems, secondaryListItems } from '../../components/Dashboard/listItems';
 import Footer from '../../components/Footer';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 import Tooltip from '@mui/material/Tooltip';
+import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 
 import { useDispatch } from 'react-redux';
 import { logout } from '../../actions/authActions'
 import dataset from '../../assets/testjson/output.json';
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Generate Order Data, this will be replaced with data from the backend
   function preventDefault(event) {
@@ -97,12 +99,79 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export default function AllDatasets() {
-    
-  const [open, setOpen] = React.useState(false);
+export default function DatasetDetails() {
+  
+  const { id: dataset_id } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [fileType, setFileType] = useState('All');
+  const [open, setOpen] = useState(false);
+  const [slurmOpen, setSlurmOpen] = useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  const [files, setFiles] = useState([]);
+
+  const transformAPIData = (apiData) => {
+    return apiData.map(file => {
+      const flatFile = {
+        id: file.id,
+        file_type: file.file_type,
+        fileName: 'N/A',
+        fileSize: 'N/A',
+        organisation: 'N/A',
+        patientId: 'N/A',
+        sampleId: 'N/A'
+      };
+
+      for (const meta of file.metadata) {
+        if (meta.metadata_key === 'file_name') {
+          flatFile.fileName = meta.metadata_value;
+        } else if (meta.metadata_key === 'file_size') {
+          flatFile.fileSize = meta.metadata_value;
+        } else if (meta.metadata_key === 'organization') {
+          flatFile.organisation = meta.metadata_value;
+        } else if (meta.metadata_key === 'patient_id') {
+          flatFile.patientId = meta.metadata_value;
+        } else if (meta.metadata_key === 'sample_id') {
+          flatFile.sampleId = meta.metadata_value;
+        }
+      }
+
+      return flatFile;
+    });
+  };
+
+  useEffect(() => {
+    const fetchFilesForDataset = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/dataset_files_metadata/${dataset_id}`);
+
+        const res = await response.json()
+        
+        if (!response.ok) {
+          throw new Error(res.detail || 'Failed to fetch files');
+        }
+
+        setFiles(transformAPIData(res));
+      } catch (err) {
+        
+      } finally {
+        
+      }
+    };
+
+    fetchFilesForDataset();
+  }, [dataset_id]);
+
+  const filteredFiles = files.filter(file => {
+    if (fileType === 'All') {
+      return true;
+    }
+    
+    return file.file_type.toLowerCase() === fileType.toLowerCase()
+  })
   
   // Extract data dynamically from the dataset
   const rawFiles = dataset.data.files.raw.map(file => ({
@@ -118,7 +187,7 @@ export default function AllDatasets() {
   
   const rawDataLocation = dataset.data.location; // Extract base path
   const rawFilesDirectory = dataset.data.files.raw.map(file => file.directory); // Extract file paths without extra quotes
-  
+
   // **Calculate Total Number of Files**
   const totalFiles = rawFiles.length;
 
@@ -161,22 +230,19 @@ export default function AllDatasets() {
       .catch(err => console.error("Failed to copy:", err));
   };
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
   const handleLogout = () => {
     dispatch(logout()); // Dispatch the logout action
     navigate('/login'); // Redirect to the login page
   };
 
   // Function to open the dialog
-  const handleOpenPop = () => {
-    setOpen(true);
+  const handleOpenSlurm = () => {
+    setSlurmOpen(true);
   };
 
   // Function to close the dialog
-  const handleClosePop = () => {
-    setOpen(false);
+  const handleCloseSlurm = () => {
+    setSlurmOpen(false);
   };
 
   return (
@@ -293,38 +359,110 @@ export default function AllDatasets() {
                     
                     <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <Paper sx={{ p: 4, flexGrow: 1 }}>
-                        <Typography variant="h5" gutterBottom>
-                          Whole-exome sequencing of Lung Cancer Tumour-Normal pairs
-                        </Typography>
-                        <Typography variant="h7">All Raw Files View ({totalFiles} – {totalFileSize} KB)</Typography>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 5}}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column'}}>
+                          <Typography variant="h5" gutterBottom>
+                            File Details for Dataset ID: {dataset_id}
+                          </Typography>
+                          <Typography variant="h7">{fileType} Files View ({filteredFiles.length} – {
+                            filteredFiles.reduce((total,file) => {
+                              return total + parseFloat(file.fileSize || 0);
+                            }, 0)
+                          } KB)
+                          </Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                          <ToggleButtonGroup
+                            color="primary"
+                            value={fileType}
+                            exclusive
+                            sx={{ height: '50px' }}
+                            onChange={(event, newFilter) => {
+                              if (newFilter !== null) {
+                                setFileType(newFilter);
+                              }
+                            }}
+                            aria-label='file type filter'
+                          >
+                            <ToggleButton value="All">All</ToggleButton>
+                            <ToggleButton value="Raw">Raw</ToggleButton>
+                            <ToggleButton value="Processed">Processed</ToggleButton>
+                            <ToggleButton value="Summarised">Summarised</ToggleButton>
 
-                        <TableContainer component={Paper} sx={{ mt: 2 }}>
-                            <Table>
+                          </ToggleButtonGroup>
+                        </Box>
+                      </Box>
+
+                        <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 539 }}>
+                            <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
                             <TableHead>
                                 <TableRow>
-                                <TableCell></TableCell>
-                                <TableCell>Filename</TableCell>
-                                <TableCell>Sample ID</TableCell>
-                                <TableCell>Patient ID</TableCell>
-                                <TableCell>Location</TableCell>
-                                <TableCell>Size</TableCell>
-                                <TableCell>REDCap complete</TableCell>
+                                <TableCell sx={{ width: '40%', fontWeight: 'bold' }} >Filename</TableCell>
+                                <TableCell sx={{ width: '25%', fontWeight: 'bold' }}>Sample ID</TableCell>
+                                <TableCell sx={{ width: '25%', fontWeight: 'bold' }}>Patient ID</TableCell>
+                                <TableCell sx={{ width: '40%', fontWeight: 'bold' }}>Location</TableCell>
+                                <TableCell sx={{ width: '20%', fontWeight: 'bold' }}>Size</TableCell>
+                                <TableCell sx={{ width: '10%', fontWeight: 'bold' }}>REDCap complete</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {rawFiles.map((file) => (
-                                <TableRow key={file.filename}>
-                                    <TableCell>
-                                
-                                    </TableCell>
-                                    <TableCell>{file.filename}</TableCell>
-                                    <TableCell>{file.sampleId}</TableCell>
-                                    <TableCell>{file.patientId}</TableCell>
-                                    <TableCell>{file.location}</TableCell>
-                                    <TableCell>{file.size}{dataFileUnit}</TableCell>
-                                    <TableCell>{file.redcap}</TableCell>
+                              {filteredFiles && filteredFiles.length > 0 ? (
+                                filteredFiles.map((file) => (
+                                <TableRow key={file.id}>
+                                    <Tooltip title={file.fileName}>
+                                      <TableCell  sx={{
+                                          maxWidth: 250,
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis'
+                                      }}>{file.fileName}</TableCell>
+                                    </Tooltip>
+
+                                    <Tooltip title={file.sampleId}>
+                                      <TableCell  sx={{
+                                          maxWidth: 250,
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis'
+                                      }}>{file.sampleId}</TableCell>
+                                    </Tooltip>
+
+                                    <Tooltip title={file.patientId}>
+                                      <TableCell  sx={{
+                                          maxWidth: 250,
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis'
+                                      }}>{file.patientId}</TableCell>
+                                    </Tooltip>
+
+                                    <Tooltip title={file.organisation}>
+                                      <TableCell  sx={{
+                                          maxWidth: 250,
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis'
+                                      }}>{file.organisation}</TableCell>
+                                    </Tooltip>
+
+                                    <Tooltip title={`${file.fileSize} ${dataFileUnit}`}>
+                                      <TableCell  sx={{
+                                          maxWidth: 250,
+                                          whiteSpace: 'nowrap',
+                                          overflow: 'hidden',
+                                          textOverflow: 'ellipsis'
+                                      }}>{file.fileSize} {dataFileUnit}</TableCell>
+                                    </Tooltip>
+                                    <TableCell>0</TableCell>
                                 </TableRow>
-                                ))}
+                                ))    
+                              ) : (
+                                <TableRow>
+                                  <TableCell colSpan={6} align="center">
+                                    No files found.
+                                  </TableCell>
+                                </TableRow>
+                              )} 
                             </TableBody>
                             </Table>
                         </TableContainer>
@@ -335,7 +473,7 @@ export default function AllDatasets() {
 
                     <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <Paper sx={{ p: 4, flexGrow: 1 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Raw Data</Typography>
+                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{fileType} Data</Typography>
 
                         {/* use the following line of code if there is an existing json file for TDE0001 */}
                         {/*<Typography variant="body2">Located: WEHI Milton {dataset.data.location}</Typography> */}
@@ -347,9 +485,9 @@ export default function AllDatasets() {
 
                         <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleCopyPython}>WEHI Jupyter Notebook</Button>
 
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleOpenPop}>SLURM pre-processing</Button>
+                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleOpenSlurm}>SLURM pre-processing</Button>
                         {/* Dialog (Popup) */}
-                        <Dialog open={open} onClose={handleClosePop} maxWidth="sm" fullWidth >
+                        <Dialog open={slurmOpen} onClose={handleCloseSlurm} maxWidth="sm" fullWidth >
                           
                           <DialogContent>
                             <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
@@ -365,7 +503,7 @@ export default function AllDatasets() {
 
                           {/* Close Button */}
                           <DialogActions>
-                            <Button onClick={handleClosePop} variant="contained" color="error">Close</Button>
+                            <Button onClick={handleCloseSlurm} variant="contained" color="error">Close</Button>
                           </DialogActions>
                         </Dialog>
                       
