@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
@@ -18,7 +19,6 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useNavigate } from 'react-router-dom';
 import { mainListItems, secondaryListItems } from '../../components/Dashboard/listItems';
 import Footer from '../../components/Footer';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
@@ -123,7 +123,9 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function SingleDataset() {
-    
+
+  const { id: datasetId } = useParams();
+  console.log(datasetId);  
   const [newFileOpen, setNewFileOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [slurmOpen, setSlurmOpen] = useState(false);
@@ -183,6 +185,7 @@ export default function SingleDataset() {
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('dataset_id', datasetId)
 
     try {
       const res = await fetch(`${BASE_URL}/ingest/upload_file_metadata`, {
@@ -480,7 +483,7 @@ export default function SingleDataset() {
           {uploadStatus === 'SUCCESS' && (
             <>
               <DialogContentText variant="body1" sx={{color: 'black'}}>
-                The Data Registry TDE0005 has been updated.
+                The Data Registry TDE0005 (id: {datasetId}) has been updated.
                 <br/><br/>
                 {summary.raw_files.count} new raw files (*.fastq, *.fasta) were registed with {summary.raw_files.total_size}{summary.file_size_unit}
                 <br/><br/>
