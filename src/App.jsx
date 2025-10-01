@@ -33,7 +33,7 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardPage />
+              <AllProjects/>
             </ProtectedRoute>
           }
         />
@@ -108,14 +108,13 @@ function App() {
           }
         />
         <Route
-          path="/project/:id"
+          path="/project/:projectId"
           element={
             <ProtectedRoute>
               <SingleProjectPage />
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dataset/details/:id"
           element={
