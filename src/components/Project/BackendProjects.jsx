@@ -229,7 +229,6 @@ export default function BackendProjects() {
                         <TableHead>
                         <TableRow>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Project ID</TableCell>
-                            <TableCell align="left" sx={{ fontWeight: 'bold' }}>Date Created</TableCell>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Name</TableCell>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Status</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Summary</TableCell>
@@ -241,7 +240,6 @@ export default function BackendProjects() {
                         {projects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((project) => (
                             <TableRow key={project.id}>
                             <TableCell align="left">{project.id}</TableCell>
-                            <TableCell align="left">{new Date(project.created_at).toLocaleDateString()}</TableCell>
                             <TableCell align="left">{project.name}</TableCell>
                             <TableCell align="left">{project.status}</TableCell>
                             <TableCell align="right">
