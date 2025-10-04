@@ -135,12 +135,12 @@ export default function AllDatasets() {
     setPage(0);
   };
 
-  // Compute displayId and "isNew" for datasets
   const datasetsWithRank = datasets.map((d, _, arr) => {
     const rank = arr.filter(x => x.project_id === d.project_id && x.id <= d.id).length;
     const createdDate = new Date(d.created_at);
     const isNew = (Date.now() - createdDate.getTime()) / (1000 * 60 * 60 * 24) <= 1; // within 1 days
-    return { ...d, displayId: `P${d.project_id}-${rank}`, isNew };
+    const paddedRank = String(rank).padStart(3, "0");
+    return { ...d, displayId: `P${d.project_id}-${paddedRank}`, isNew };
   });
 
   const isFormValid =
@@ -248,8 +248,7 @@ export default function AllDatasets() {
                             <TableRow key={dataset.id}>
                               <TableCell>{dataset.displayId}</TableCell>
 
-                              {/* Name column with NEW tag */}
-                              <TableCell sx={{ fontSize: '16px' }}>
+                              <TableCell>
                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                   <span>{dataset.name || "—"}</span>
                                   {dataset.isNew && (
@@ -287,11 +286,26 @@ export default function AllDatasets() {
                   </Table>
 
                   {/* Bottom Section */}
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 2 }}>
-                    <Button variant="contained" color="primary" onClick={handleOpenRegister} sx={{ textTransform: 'none', height: '36px' }}>
-                      Register New Dataset
-                    </Button>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      mt: 2
+                    }}
+                  >
+                    {projectId && (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleOpenRegister}
+                        sx={{ textTransform: 'none', height: '36px' }}
+                      >
+                        Register New Dataset
+                      </Button>
+                    )}
 
+                    <Box sx={{ display: "flex", justifyContent: "flex-end", flexGrow: 1 }}>
                     <TablePagination
                       rowsPerPageOptions={[5, 10, 25]}
                       component="div"
@@ -305,6 +319,7 @@ export default function AllDatasets() {
                         '& .MuiInputBase-root': { height: 36 },
                       }}
                     />
+                   </Box>
                   </Box>
                 </Paper>
               </Grid>
