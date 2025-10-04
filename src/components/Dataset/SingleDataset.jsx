@@ -316,7 +316,8 @@ export default function SingleDataset() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Data Registry for Project {datasetData?.project_id || 1}
+              {/* Data Registry for Project {datasetData?.project_id || 1} */}
+              TUFT Data Environment - Data Registry
             </Typography>
             <div style={{ display: 'flex', 
                           alignItems: 'center',
