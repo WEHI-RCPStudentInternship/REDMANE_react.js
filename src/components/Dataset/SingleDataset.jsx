@@ -27,8 +27,6 @@ import Tooltip from '@mui/material/Tooltip';
 
 import { useDispatch } from 'react-redux';
 import { logout } from '../../actions/authActions'
-import dataset from '../../assets/testjson/output.json';
-
 
 // Generate Order Data, this will be replaced with data from the backend
 function createData(id, dId, date, name, source) {
@@ -131,18 +129,60 @@ export default function SingleDataset() {
   const [slurmOpen, setSlurmOpen] = useState(false);
   const [uploadStatus, setUploadStatus] = useState('IDLE');
   const [summary, setSummary] = useState(null);
+  const [datasetData, setDatasetData] = useState(null);
+  const [rawDataLocation, setRawDataLocation] = useState("");
+  const [rawFiles, setRawFiles] = useState([]);
+  const [processedFiles, setProcessedFiles] = useState([]);
+  const [summaryFiles, setSummaryFiles] = useState([]);
+  const [readmeFiles, setReadmeFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch dataset from backend
+  React.useEffect(() => {
+    const fetchDataset = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/datasets_with_metadata/${datasetId}`);
+        if (!response.ok) throw new Error("Failed to fetch dataset details");
+        const data = await response.json();
+        setDatasetData(data);
+
+        const locationMeta = data.metadata?.find((m) => m.key === "location")?.value || "";
+        setRawDataLocation(locationMeta);
+
+        const parseFiles = (val) =>
+          val ? val.split(",").map((f) => f.trim()).filter(Boolean) : [];
+  
+        setRawFiles(parseFiles(meta.raw_files));
+        setProcessedFiles(parseFiles(meta.processed_files));
+        setSummaryFiles(parseFiles(meta.summary_files));
+        setReadmeFiles(parseFiles(meta.readme_files));
+  
+      } catch (err) {
+        console.error("Error fetching dataset:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchDataset();
+  }, [datasetId]);
   
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
   const fileInputRef = useRef(null);
-  
-  const rawDataLocation = dataset.data.location; // Extract base path
-  const rawFiles = dataset.data.files.raw.map(file => file.directory); // Extract file paths without extra quotes
-  
+
   // Format as Python code
-  const pythonCode = `import os\n\nbase_path = '${rawDataLocation}'\nraw_file_array = [\n  ${rawFiles.map(file => `'${file}'`).join(",\n  ")}\n]\n`;
+  const pythonCode = `import os
+
+      base_path = '${rawDataLocation}'
+
+      raw_files = [${(rawFiles ?? []).map(f => `'${f}'`).join(", ")}]
+      processed_files = [${(processedFiles ?? []).map(f => `'${f}'`).join(", ")}]
+      summary_files = [${(summaryFiles ?? []).map(f => `'${f}'`).join(", ")}]
+      summary_files = [${(readmeFiles ?? []).map(f => `'${f}'`).join(", ")}]
+      `;
   
   const rCode = `
       # Define the base path
@@ -159,8 +199,6 @@ export default function SingleDataset() {
       # Print the file paths
       print(file_paths)
       `;
-  
-
 
   // Copy function Python
   const handleCopyPython = () => {
@@ -278,7 +316,7 @@ export default function SingleDataset() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              TUFT Data Environment - Data Registry
+              Data Registry for Project {datasetData?.project_id || 1}
             </Typography>
             <div style={{ display: 'flex', 
                           alignItems: 'center',
@@ -360,21 +398,36 @@ export default function SingleDataset() {
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                 <Grid container spacing={3}>
                     
+                    {/* Left panel — dataset details */}
                     <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <Paper sx={{ p: 4, flexGrow: 1 }}>
-                        <Typography variant="h5" gutterBottom>
-                          Whole-exome sequencing of Lung Cancer Tumour-Normal pairs
-                        </Typography>
-                        <Typography variant="h6" sx={{ color: 'gray', lineHeight: '2' }} gutterBottom>
-                          TDE0001
-                        </Typography>
-                        <Typography variant="body1">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vehicula, mauris eget ullamcorper pellentesque, risus dolor consequat ligula, a dictum lacus odio at odio. Integer cursus dui at libero hendrerit, vitae auctor metus tempus. Duis facilisis justo ut orci varius, at molestie metus sollicitudin. Nunc accumsan, lorem eget luctus euismod, metus augue facilisis libero, eget egestas lectus libero eget magna.
-                        </Typography>
-                        <Button variant='outlined' sx={{ mr: 2, mt: 7 }} onClick={handleOpenNewFile}>
-                          Update Data Registry
-                        </Button>
-                    </Paper>
+                    {loading ? (
+                          <Typography>Loading dataset...</Typography>
+                        ) : (
+                          <>
+                            <Typography variant="h4" gutterBottom>
+                              {datasetData?.name || "Untitled Dataset"}
+                            </Typography>
+
+                            <Typography variant="h6" sx={{ color: 'gray', lineHeight: '2' }} gutterBottom>
+                            {datasetData?.displayId || `P${datasetData?.project_id}-${String(datasetData?.id).padStart(3, '0')}`}
+                            </Typography>
+
+                            <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line' }}>
+                              {datasetData?.abstract ||
+                                "No abstract provided for this dataset. Please update the record to include details."}
+                            </Typography>
+
+                            <Button
+                              variant="outlined"
+                              sx={{ mr: 2, mt: 3 }}
+                              onClick={handleOpenNewFile}
+                            >
+                              Update Data Registry
+                            </Button>
+                          </>
+                        )}
+                      </Paper>
                     </Grid>
 
                     <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -384,7 +437,9 @@ export default function SingleDataset() {
                         {/* use the following line of code if there is an existing json file for TDE0001 */}
                         {/*<Typography variant="body2">Located: WEHI Milton {dataset.data.location}</Typography> */}
 
-                        <Typography variant="body2">Located: WEHI Milton /vast/projects/TDE/TDE0001</Typography>
+                        <Typography variant="body2">
+                          Located: {datasetData?.site || "Unknown site"} {rawDataLocation}
+                        </Typography>
 
                         <Divider sx={{ my: 2 }} />
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Copy code for raw data</Typography>
@@ -428,7 +483,7 @@ export default function SingleDataset() {
                         <Divider sx={{ my: 2 }} />
 
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Other views</Typography>
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/dashboard')}>All Samples View</Button>
+                        {/*<Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/dashboard')}>All Samples View</Button> */}
                         <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/datasets')}>All Datasets View</Button>
                         <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/patients')}>All Samples Summary</Button>
 
@@ -454,7 +509,7 @@ export default function SingleDataset() {
           {uploadStatus === 'IDLE' && (
             <>
               <DialogContentText variant="body1" sx={{color: 'black'}}>
-                Go to WEHI Milton /vast/projects/TDE/TDE0005
+                Go to {datasetData?.site || "Unknown site"} {rawDataLocation}
                 <br/><br/>
                 You will need to run the update_local.sh script on the command line. <a href="https://github.com/lara-pawar/REDMANE-metadata-generator-with-RO-Crate" target='_blank'>[Click here if you need help]</a>
                 <br/><br/>
