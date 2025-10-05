@@ -146,6 +146,11 @@ export default function SingleDataset() {
         const data = await response.json();
         setDatasetData(data);
 
+        const meta = data.metadata?.reduce((acc, m) => {
+          acc[m.key] = m.value;
+          return acc;
+        }, {});
+
         const locationMeta = data.metadata?.find((m) => m.key === "location")?.value || "";
         setRawDataLocation(locationMeta);
 

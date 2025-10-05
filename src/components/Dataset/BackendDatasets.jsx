@@ -112,11 +112,15 @@ export default function AllDatasets() {
 
   const fetchDatasets = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/datasets/?project_id=${projectId}`);
+      const url = projectId
+      ? `${BASE_URL}/datasets/?project_id=${projectId}`
+      : `${BASE_URL}/datasets/`;
+
+      const res = await fetch(url);
+
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
       if (Array.isArray(data)) {
-        data.sort((a, b) => a.id - b.id);
         setDatasets(data);
       } else {
         console.error("Unexpected response:", data);
@@ -127,7 +131,7 @@ export default function AllDatasets() {
       setDatasets([]);
     }
   };
-  
+
 
   const handleLogout = () => {
     dispatch(logout());
