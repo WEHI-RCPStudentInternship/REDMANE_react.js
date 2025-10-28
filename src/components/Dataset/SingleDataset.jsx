@@ -1,9 +1,11 @@
 import * as React from 'react';
+import { useState, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
@@ -17,7 +19,6 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { useNavigate } from 'react-router-dom';
 import { mainListItems, secondaryListItems } from '../../components/Dashboard/listItems';
 import Footer from '../../components/Footer';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
@@ -26,13 +27,13 @@ import Tooltip from '@mui/material/Tooltip';
 
 import { useDispatch } from 'react-redux';
 import { logout } from '../../actions/authActions'
-import dataset from '../../assets/testjson/output.json';
-
 
 // Generate Order Data, this will be replaced with data from the backend
 function createData(id, dId, date, name, source) {
     return { id, dId, date, name, source};
 }
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const rows = [
     createData(5, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
@@ -119,18 +120,74 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export default function AllDatasets() {
-    
-  const [open, setOpen] = React.useState(false);
+export default function SingleDataset() {
+
+  const { id: datasetId } = useParams();
+  console.log(datasetId);  
+  const [newFileOpen, setNewFileOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [slurmOpen, setSlurmOpen] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState('IDLE');
+  const [summary, setSummary] = useState(null);
+  const [datasetData, setDatasetData] = useState(null);
+  const [rawDataLocation, setRawDataLocation] = useState("");
+  const [rawFiles, setRawFiles] = useState([]);
+  const [processedFiles, setProcessedFiles] = useState([]);
+  const [summaryFiles, setSummaryFiles] = useState([]);
+  const [readmeFiles, setReadmeFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch dataset from backend
+  React.useEffect(() => {
+    const fetchDataset = async () => {
+      try {
+        const response = await fetch(`${BASE_URL}/datasets_with_metadata/${datasetId}`);
+        if (!response.ok) throw new Error("Failed to fetch dataset details");
+        const data = await response.json();
+        setDatasetData(data);
+
+        const meta = data.metadata?.reduce((acc, m) => {
+          acc[m.key] = m.value;
+          return acc;
+        }, {});
+
+        const locationMeta = data.metadata?.find((m) => m.key === "location")?.value || "";
+        setRawDataLocation(locationMeta);
+
+        const parseFiles = (val) =>
+          val ? val.split(",").map((f) => f.trim()).filter(Boolean) : [];
+  
+        setRawFiles(parseFiles(meta.raw_files));
+        setProcessedFiles(parseFiles(meta.processed_files));
+        setSummaryFiles(parseFiles(meta.summary_files));
+        setReadmeFiles(parseFiles(meta.readme_files));
+  
+      } catch (err) {
+        console.error("Error fetching dataset:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchDataset();
+  }, [datasetId]);
+  
   const toggleDrawer = () => {
     setOpen(!open);
   };
-  
-  const rawDataLocation = dataset.data.location; // Extract base path
-  const rawFiles = dataset.data.files.raw.map(file => file.directory); // Extract file paths without extra quotes
-  
+
+  const fileInputRef = useRef(null);
+
   // Format as Python code
-  const pythonCode = `import os\n\nbase_path = '${rawDataLocation}'\nraw_file_array = [\n  ${rawFiles.map(file => `'${file}'`).join(",\n  ")}\n]\n`;
+  const pythonCode = `import os
+
+      base_path = '${rawDataLocation}'
+
+      raw_files = [${(rawFiles ?? []).map(f => `'${f}'`).join(", ")}]
+      processed_files = [${(processedFiles ?? []).map(f => `'${f}'`).join(", ")}]
+      summary_files = [${(summaryFiles ?? []).map(f => `'${f}'`).join(", ")}]
+      summary_files = [${(readmeFiles ?? []).map(f => `'${f}'`).join(", ")}]
+      `;
   
   const rCode = `
       # Define the base path
@@ -147,8 +204,6 @@ export default function AllDatasets() {
       # Print the file paths
       print(file_paths)
       `;
-  
-
 
   // Copy function Python
   const handleCopyPython = () => {
@@ -164,6 +219,53 @@ export default function AllDatasets() {
       .catch(err => console.error("Failed to copy:", err));
   };
 
+  const handleFileChangeAndUpload = async (event) => {
+    const file = event.target.files[0];
+
+    if (!file) {
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('dataset_id', datasetId)
+
+    try {
+      const res = await fetch(`${BASE_URL}/ingest/upload_file_metadata`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      const response = await res.json();
+
+      if (!res.ok) {
+        throw new Error(response.detail || 'Upload failed');
+      }
+
+      setSummary(response.summary);
+      setUploadStatus("SUCCESS");
+
+    } catch (err) {
+      setUploadStatus("ERROR");
+    } finally {
+      event.target.value = null;
+    }
+  
+  }
+
+  const handleSelectFileClick = () => {
+    fileInputRef.current.click();
+  }
+
+  const handleCloseNewFile = () => {
+    setNewFileOpen(false);
+  }
+
+  const handleResetDialog = () => {
+    setUploadStatus('IDLE');
+    setSummary(null);
+  }
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -174,13 +276,21 @@ export default function AllDatasets() {
 
   // Function to open the dialog
   const handleOpenPop = () => {
-    setOpen(true);
+    setSlurmOpen(true);
   };
 
   // Function to close the dialog
   const handleClosePop = () => {
-    setOpen(false);
+    setSlurmOpen(false);
   };
+
+  const handleOpenNewFile = () => {
+    setNewFileOpen(true);
+  };
+
+  const handleCloseUpdate = () => {
+    setNewFileOpen(false);
+  }
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -211,6 +321,7 @@ export default function AllDatasets() {
               noWrap
               sx={{ flexGrow: 1 }}
             >
+              {/* Data Registry for Project {datasetData?.project_id || 1} */}
               TUFT Data Environment - Data Registry
             </Typography>
             <div style={{ display: 'flex', 
@@ -293,18 +404,36 @@ export default function AllDatasets() {
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
                 <Grid container spacing={3}>
                     
+                    {/* Left panel — dataset details */}
                     <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <Paper sx={{ p: 4, flexGrow: 1 }}>
-                        <Typography variant="h5" gutterBottom>
-                          Whole-exome sequencing of Lung Cancer Tumour-Normal pairs
-                        </Typography>
-                        <Typography variant="h6" sx={{ color: 'gray', lineHeight: '2' }} gutterBottom>
-                          TDE0001
-                        </Typography>
-                        <Typography variant="body1">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque vehicula, mauris eget ullamcorper pellentesque, risus dolor consequat ligula, a dictum lacus odio at odio. Integer cursus dui at libero hendrerit, vitae auctor metus tempus. Duis facilisis justo ut orci varius, at molestie metus sollicitudin. Nunc accumsan, lorem eget luctus euismod, metus augue facilisis libero, eget egestas lectus libero eget magna.
-                        </Typography>
-                    </Paper>
+                    {loading ? (
+                          <Typography>Loading dataset...</Typography>
+                        ) : (
+                          <>
+                            <Typography variant="h4" gutterBottom>
+                              {datasetData?.name || "Untitled Dataset"}
+                            </Typography>
+
+                            <Typography variant="h6" sx={{ color: 'gray', lineHeight: '2' }} gutterBottom>
+                            {datasetData?.displayId || `P${datasetData?.project_id}-${String(datasetData?.id).padStart(3, '0')}`}
+                            </Typography>
+
+                            <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line' }}>
+                              {datasetData?.abstract ||
+                                "No abstract provided for this dataset. Please update the record to include details."}
+                            </Typography>
+
+                            <Button
+                              variant="outlined"
+                              sx={{ mr: 2, mt: 3 }}
+                              onClick={handleOpenNewFile}
+                            >
+                              Update Data Registry
+                            </Button>
+                          </>
+                        )}
+                      </Paper>
                     </Grid>
 
                     <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -314,7 +443,9 @@ export default function AllDatasets() {
                         {/* use the following line of code if there is an existing json file for TDE0001 */}
                         {/*<Typography variant="body2">Located: WEHI Milton {dataset.data.location}</Typography> */}
 
-                        <Typography variant="body2">Located: WEHI Milton /vast/projects/TDE/TDE0001</Typography>
+                        <Typography variant="body2">
+                          Located: {datasetData?.site || "Unknown site"} {rawDataLocation}
+                        </Typography>
 
                         <Divider sx={{ my: 2 }} />
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Copy code for raw data</Typography>
@@ -323,7 +454,7 @@ export default function AllDatasets() {
 
                         <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleOpenPop}>SLURM pre-processing</Button>
                         {/* Dialog (Popup) */}
-                        <Dialog open={open} onClose={handleClosePop} maxWidth="sm" fullWidth >
+                        <Dialog open={slurmOpen} onClose={handleClosePop} maxWidth="sm" fullWidth >
                           
                           <DialogContent>
                             <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
@@ -358,12 +489,12 @@ export default function AllDatasets() {
                         <Divider sx={{ my: 2 }} />
 
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Other views</Typography>
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/dashboard')}>All Samples View</Button>
+                        {/*<Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/dashboard')}>All Samples View</Button> */}
                         <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/datasets')}>All Datasets View</Button>
                         <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/patients')}>All Samples Summary</Button>
 
                         {/* hard coded */}
-                        <Button variant="outlined" sx={{ mt: 1 }} onClick={() => navigate('/dataset/details/BIOL10001')}>Files for this dataset</Button>
+                        <Button variant="outlined" sx={{ mt: 1 }} onClick={() => navigate(`/dataset/details/${datasetId}`)}>Files for this dataset</Button>
                     </Paper>
                     </Grid>
                 </Grid>
@@ -372,6 +503,78 @@ export default function AllDatasets() {
 
         </Box>
       </Box>
+
+      <Dialog open={newFileOpen} onClose={handleCloseUpdate} TransitionProps={{ onExited: handleResetDialog }}
+      fullWidth maxWidth='sm'>
+        <DialogTitle variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center', py: 4}}>
+          {uploadStatus === 'IDLE' && "How to update Data Registry"}
+          {uploadStatus === 'SUCCESS' && 'TDE0005 updated'}
+          {uploadStatus === 'ERROR' && 'Upload error'}
+        </DialogTitle>
+        <DialogContent>
+          {uploadStatus === 'IDLE' && (
+            <>
+              <DialogContentText variant="body1" sx={{color: 'black'}}>
+                Go to {datasetData?.site || "Unknown site"} {rawDataLocation}
+                <br/><br/>
+                You will need to run the update_local.sh script on the command line. <a href="https://github.com/lara-pawar/REDMANE-metadata-generator-with-RO-Crate" target='_blank'>[Click here if you need help]</a>
+                <br/><br/>
+                This will create an output.html and output.json file.
+                <br/><br/>
+                Once you run the script, please review the output.html file.
+                <br/><br/>
+                Once you are satisfied that the html file is OK, click on the button below to upload output.json. You can also use
+                update_data_registry.sh to upload the output.json file
+              </DialogContentText>
+
+              <input
+                type='file'
+                accept='.json'
+                hidden
+                ref={fileInputRef}
+                onChange={handleFileChangeAndUpload}
+              />
+
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Button variant="outlined" onClick={handleSelectFileClick} sx={{ mt: 3, mb: 2}} >Upload output.json file</Button>
+              </Box>
+            </>
+          )}
+
+          {uploadStatus === 'SUCCESS' && (
+            <>
+              <DialogContentText variant="body1" sx={{color: 'black'}}>
+                The Data Registry TDE0005 (id: {datasetId}) has been updated.
+                <br/><br/>
+                {summary.raw_files.count} new raw files (*.fastq, *.fasta) were registed with {summary.raw_files.total_size}{summary.file_size_unit}
+                <br/><br/>
+                {summary.processed_files.count} new processed files (*.cram, *.bam) were registed with {summary.processed_files.total_size}{summary.file_size_unit}
+                <br/><br/>
+                {summary.summarised_files.count} new summarised files (*.vcf, *.maf) were registed with {summary.summarised_files.total_size}{summary.file_size_unit}
+                <br/><br/>
+                Receipt number is 78746776433
+              </DialogContentText>
+
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Button variant="outlined" onClick={handleCloseNewFile} sx={{ mt: 3, mb: 2 }} >Close</Button>
+              </Box>
+            </>
+          )}
+
+          {uploadStatus === 'ERROR' && (
+            <>
+              <DialogContentText variant="body1" sx={{color: 'black'}}>
+                Error uploading file. Make sure you are selecting the correct output.json file.
+              </DialogContentText>
+
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Button variant="outlined" onClick={handleCloseNewFile} sx={{ mt: 3, mb: 1 }} >Close</Button>
+              </Box>
+            </>
+          )}
+
+        </DialogContent>
+      </Dialog>
     </ThemeProvider>
   );
 }
