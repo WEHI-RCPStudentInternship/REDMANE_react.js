@@ -17,7 +17,7 @@ Data Commons is a web application built using React, designed to manage datasets
 The project is structured into several directories:
 
 ```plaintext
-data-commons/
+REDMANE_react.js/
 │
 ├── public/                # Public assets like images, fonts, etc.
 ├── src/                   # Source code for the project
@@ -25,19 +25,26 @@ data-commons/
 │   │   └── authActions.js # Actions related to authentication
 │   ├── assets/            # Assets like images and logos
 │   │   └── logos/         # Logos used in the application
+│   │   └── testjson/       # JSON files for testing 
 │   ├── components/        # Reusable components
 │   │   ├── Dashboard/     # Components related to the dashboard
 │   │   ├── Dataset/       # Components related to datasets
 │   │   ├── Patient/       # Components related to patients
 │   │   ├── Project/       # Components related to projects
 │   │   ├── Footer.jsx     # Footer component
-│   │   ├── Home.jsx       # Home component
+│   │   ├── Login.jsx      # Login component
 │   │   ├── LogOutButton.jsx # Log Out button component
+│   │   └── ProjectSummary.jsx # Project summary component
 │   │   └── ProtectedRoute.jsx # Component to protect routes based on authentication
+│   │   └── Upload.jsx     # Register dataset component
 │   ├── pages/             # Page components, categorized by functionality
 │   │   ├── DatasetPage/   # Pages related to datasets
 │   │   ├── PatientPage/   # Pages related to patients
 │   │   └── ProjectPage/   # Pages related to projects
+│   │   └── DashboardPage.jsx # Dashboard page
+│   │   └── LoginPage.jsx  # Login page
+│   │   └── ProjectSummaryPage.jsx # Project Summary Page
+│   │   └── UploadPage.jsx # Upload Page
 │   ├── reducers/          # Redux reducers to manage state
 │   ├── App.jsx            # Main application component
 │   ├── index.css          # Global styles
@@ -61,8 +68,8 @@ data-commons/
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/HxLu03/DataCommons.git
-   cd data-commons
+   git clone git@github.com:WEHI-RCPStudentInternship/REDMANE_react.js.git
+   cd REDMANE_react.js
    ```
 
 2. **Install dependencies:**

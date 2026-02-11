@@ -34,6 +34,7 @@ import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 
 const drawerWidth = 240;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -102,6 +103,10 @@ export default function BackendProjects() {
     navigate('/login');
   };
 
+  const handleViewSummary = (projectId) => {
+    navigate(`/project/${projectId}`);
+  };
+
   const handleViewDatasets = (projectId) => {
     navigate(`/datasets?project_id=${projectId}`);
   };
@@ -122,7 +127,7 @@ export default function BackendProjects() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const response = await fetch('http://115.146.84.144/projects/');
+        const response = await fetch(`${BASE_URL}/projects/`);
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
@@ -224,9 +229,9 @@ export default function BackendProjects() {
                         <TableHead>
                         <TableRow>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Project ID</TableCell>
-                            <TableCell align="left" sx={{ fontWeight: 'bold' }}>Date Created</TableCell>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Name</TableCell>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Status</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Summary</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Datasets</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Patients</TableCell>
                         </TableRow>
@@ -235,9 +240,19 @@ export default function BackendProjects() {
                         {projects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((project) => (
                             <TableRow key={project.id}>
                             <TableCell align="left">{project.id}</TableCell>
-                            <TableCell align="left">{new Date(project.created_at).toLocaleDateString()}</TableCell>
                             <TableCell align="left">{project.name}</TableCell>
                             <TableCell align="left">{project.status}</TableCell>
+                            <TableCell align="right">
+                                <Button
+                                variant="contained"
+                                color="info"
+                                size="small"
+                                onClick={() => handleViewSummary(project.id)}
+                                sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
+                                >
+                                View Summary
+                                </Button>
+                            </TableCell>
                             <TableCell align="right">
                                 <Button
                                 variant="contained"
@@ -252,7 +267,7 @@ export default function BackendProjects() {
                             <TableCell align="right">
                                 <Button
                                 variant="contained"
-                                color="secondary"
+                                color="success"
                                 size="small"
                                 onClick={() => handleViewPatients(project.id)}
                                 sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}

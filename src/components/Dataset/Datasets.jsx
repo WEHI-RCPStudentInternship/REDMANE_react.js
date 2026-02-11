@@ -8,6 +8,8 @@ import TableRow from '@mui/material/TableRow';
 import Title from '../Dashboard/Title';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@mui/material';
+import Box from '@mui/material/Box';
+
 
 // Generate Order Data
 function createData(id, dId, date, name, source) {
@@ -70,7 +72,23 @@ export default function Datasets({ title = "Recent Datasets", size = "small", sh
 
     return (
       <React.Fragment>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title>{title}</Title>
+        <Button
+          variant="contained"
+          sx={{
+            minWidth: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
+          onClick={() => navigate('/upload')}
+        >
+          +
+        </Button>
+      </Box>
         <Table size={size}>
           <TableHead>
             <TableRow>
