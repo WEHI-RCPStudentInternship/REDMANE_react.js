@@ -1,5 +1,6 @@
 import * as React from 'react';
-import Avatar from '@mui/material/Avatar';
+import { useEffect } from 'react';
+import { useAuth0 } from '@auth0/auth0-react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -19,30 +20,37 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';  // Import useDispatch hook
 import { login } from '../actions/authActions';  // Import login action
 
-const defaultTheme = createTheme();
+const defaultTheme = createTheme()
 
 export default function SignIn() {
+  const { loginWithRedirect, isAuthenticated } = useAuth0();
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/projects');
+    }
+  }, [isAuthenticated]);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();  // Initialize dispatch function
 
   const handleSubmit = (event) => {
-    event.preventDefault();
-    
-    // Get the form data
-    const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const password = data.get('password');
+    const { loginWithRedirect } = useAuth0();
 
-    // Replace this with actual authentication logic
-    const isAuthenticated = email === '' && password === '';
 
-    if (isAuthenticated) {
-      dispatch(login());  // Dispatch login action
-      navigate('/dashboard');  // Redirect to the dashboard
-    } else {
-      alert('Invalid credentials');
-    }
+    // // Get the form data
+    // const data = new FormData(event.currentTarget);
+    // const email = data.get('email');
+    // const password = data.get('password');
+
+    // // Replace this with actual authentication logic
+    // const isAuthenticated = email === '' && password === '';
+
+    // if (isAuthenticated) {
+    //   dispatch(login());  // Dispatch login action
+    //   navigate('/dashboard');  // Redirect to the dashboard
+    // } else {
+    //   alert('Invalid credentials');
+    // }
   };
 
   return (
@@ -61,7 +69,7 @@ export default function SignIn() {
             <img src={WehiLogo} alt="WEHI" width="240" height="80" style={{ marginRight: '20px' }} />
             <div style={{ borderLeft: '2px solid grey', height: '100px', marginRight: '15px' }}></div>
             <img src={MelbUniLogo} alt="Melbourne University" width="90" height="90" />
-          </div> 
+          </div>
           <br />
           <Typography component="h1" variant="h5">
             Sign in
@@ -92,10 +100,10 @@ export default function SignIn() {
               label="Remember me"
             />
             <Button
-              type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 1, mb: 2 }}
+              onClick={() => loginWithRedirect()}
             >
               Sign In
             </Button>
@@ -105,7 +113,7 @@ export default function SignIn() {
               variant="contained"
               sx={{ mt: 1, mb: 2 }}
             >
-              <BusinessIcon sx={{mr: 1 }}/>
+              <BusinessIcon sx={{ mr: 1 }} />
               Sign In Through Your Institution
             </Button>
             <Grid container>
@@ -121,7 +129,7 @@ export default function SignIn() {
               </Grid>
             </Grid>
           </Box>
-        </Box>    
+        </Box>
         <Footer />
       </Container>
     </ThemeProvider>

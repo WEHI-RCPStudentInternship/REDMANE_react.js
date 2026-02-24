@@ -26,15 +26,15 @@ import Tooltip from '@mui/material/Tooltip';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 
 import { useDispatch } from 'react-redux';
-import { logout } from '../../actions/authActions'
+// import { logout } from '../../actions/authActions'
 import dataset from '../../assets/testjson/output.json';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 // Generate Order Data, this will be replaced with data from the backend
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+function preventDefault(event) {
+  event.preventDefault();
+}
 
 function Copyright(props) {
   return (
@@ -100,7 +100,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function DatasetDetails() {
-  
+
   const { id: dataset_id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -149,16 +149,16 @@ export default function DatasetDetails() {
         const response = await fetch(`${BASE_URL}/dataset_files_metadata/${dataset_id}`);
 
         const res = await response.json()
-        
+
         if (!response.ok) {
           throw new Error(res.detail || 'Failed to fetch files');
         }
 
         setFiles(transformAPIData(res));
       } catch (err) {
-        
+
       } finally {
-        
+
       }
     };
 
@@ -169,10 +169,10 @@ export default function DatasetDetails() {
     if (fileType === 'All') {
       return true;
     }
-    
+
     return file.file_type.toLowerCase() === fileType.toLowerCase()
   })
-  
+
   // Extract data dynamically from the dataset
   const rawFiles = dataset.data.files.raw.map(file => ({
     filename: file.file_name,
@@ -184,7 +184,7 @@ export default function DatasetDetails() {
   }));
 
   const dataFileUnit = dataset.data.file_size_unit;
-  
+
   const rawDataLocation = dataset.data.location; // Extract base path
   const rawFilesDirectory = dataset.data.files.raw.map(file => file.directory); // Extract file paths without extra quotes
 
@@ -192,12 +192,12 @@ export default function DatasetDetails() {
   const totalFiles = rawFiles.length;
 
   const totalFileSize = dataset.data.files.raw
-  .map(file => Number(file.file_size)) // Ensure numbers
-  .reduce((acc, size) => acc + size, 0); // Sum them up
+    .map(file => Number(file.file_size)) // Ensure numbers
+    .reduce((acc, size) => acc + size, 0); // Sum them up
 
   // Format as Python code
   const pythonCode = `import os\n\nbase_path = '${rawDataLocation}'\nraw_file_array = [\n  ${rawFilesDirectory.map(file => `'${file}'`).join(",\n  ")}\n]\n`;
-  
+
   const rCode = `
       # Define the base path
       base_path <- "${rawDataLocation}"
@@ -213,7 +213,7 @@ export default function DatasetDetails() {
       # Print the file paths
       print(file_paths)
       `;
-  
+
 
 
   // Copy function Python
@@ -276,41 +276,44 @@ export default function DatasetDetails() {
             >
               TUFT Data Environment - Data Registry
             </Typography>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
-              <img src={WehiLogo} alt="WEHI" width="90" height="30" 
-                   style={{marginLeft: '10px', marginRight: '10px' }} />
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
+              <img src={WehiLogo} alt="WEHI" width="90" height="30"
+                style={{ marginLeft: '10px', marginRight: '10px' }} />
             </div>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
               <img src={MelbUniLogo} alt="Melbourne University" width="30" height="30"
-                   style={{marginLeft: '2px', marginRight: '2px' }} />
+                style={{ marginLeft: '2px', marginRight: '2px' }} />
             </div>
             <Box sx={{ marginRight: '10px' }}> {/* Adjust the marginLeft value as needed */}
               <Button
-               variant="contained"
-               color="warning"
-               onClick={handleLogout}
-               sx={{ textTransform: 'none',
-                     padding: '5px 20px', // Increase padding for a bigger button
-                     fontSize: '16px', // Increase font size
-                     backgroundColor: '#00274D', // Choose a slightly darker or lighter shade of blue
-                    '&:hover': {
+                variant="contained"
+                color="warning"
+                onClick={handleLogout}
+                sx={{
+                  textTransform: 'none',
+                  padding: '5px 20px', // Increase padding for a bigger button
+                  fontSize: '16px', // Increase font size
+                  backgroundColor: '#00274D', // Choose a slightly darker or lighter shade of blue
+                  '&:hover': {
                     backgroundColor: '#0056b3', // Darker shade for hover state
-                    }, 
-                  }}
+                  },
+                }}
               >
                 Log Out
               </Button>
@@ -354,185 +357,185 @@ export default function DatasetDetails() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            
-                <Grid container spacing={3}>
-                    
-                    <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <Paper sx={{ p: 4, flexGrow: 1 }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 5}}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column'}}>
-                          <Typography variant="h5" gutterBottom>
-                            File Details for Dataset ID: {dataset_id}
-                          </Typography>
-                          <Typography variant="h7">{fileType} Files View ({filteredFiles.length} – {
-                            filteredFiles.reduce((total,file) => {
-                              return total + parseFloat(file.fileSize || 0);
-                            }, 0)
-                          } KB)
-                          </Typography>
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                          <ToggleButtonGroup
-                            color="primary"
-                            value={fileType}
-                            exclusive
-                            sx={{ height: '50px' }}
-                            onChange={(event, newFilter) => {
-                              if (newFilter !== null) {
-                                setFileType(newFilter);
-                              }
-                            }}
-                            aria-label='file type filter'
-                          >
-                            <ToggleButton value="All">All</ToggleButton>
-                            <ToggleButton value="Raw">Raw</ToggleButton>
-                            <ToggleButton value="Processed">Processed</ToggleButton>
-                            <ToggleButton value="Summarised">Summarised</ToggleButton>
 
-                          </ToggleButtonGroup>
-                        </Box>
-                      </Box>
+            <Grid container spacing={3}>
 
-                        <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 539 }}>
-                            <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
-                            <TableHead>
-                                <TableRow>
-                                <TableCell sx={{ width: '40%', fontWeight: 'bold' }} >Filename</TableCell>
-                                <TableCell sx={{ width: '25%', fontWeight: 'bold' }}>Sample ID</TableCell>
-                                <TableCell sx={{ width: '25%', fontWeight: 'bold' }}>Patient ID</TableCell>
-                                <TableCell sx={{ width: '40%', fontWeight: 'bold' }}>Location</TableCell>
-                                <TableCell sx={{ width: '20%', fontWeight: 'bold' }}>Size</TableCell>
-                                <TableCell sx={{ width: '10%', fontWeight: 'bold' }}>REDCap complete</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                              {filteredFiles && filteredFiles.length > 0 ? (
-                                filteredFiles.map((file) => (
-                                <TableRow key={file.id}>
-                                    <Tooltip title={file.fileName}>
-                                      <TableCell  sx={{
-                                          maxWidth: 250,
-                                          whiteSpace: 'nowrap',
-                                          overflow: 'hidden',
-                                          textOverflow: 'ellipsis'
-                                      }}>{file.fileName}</TableCell>
-                                    </Tooltip>
+              <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Paper sx={{ p: 4, flexGrow: 1 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'row', gap: 5 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                      <Typography variant="h5" gutterBottom>
+                        File Details for Dataset ID: {dataset_id}
+                      </Typography>
+                      <Typography variant="h7">{fileType} Files View ({filteredFiles.length} – {
+                        filteredFiles.reduce((total, file) => {
+                          return total + parseFloat(file.fileSize || 0);
+                        }, 0)
+                      } KB)
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+                      <ToggleButtonGroup
+                        color="primary"
+                        value={fileType}
+                        exclusive
+                        sx={{ height: '50px' }}
+                        onChange={(event, newFilter) => {
+                          if (newFilter !== null) {
+                            setFileType(newFilter);
+                          }
+                        }}
+                        aria-label='file type filter'
+                      >
+                        <ToggleButton value="All">All</ToggleButton>
+                        <ToggleButton value="Raw">Raw</ToggleButton>
+                        <ToggleButton value="Processed">Processed</ToggleButton>
+                        <ToggleButton value="Summarised">Summarised</ToggleButton>
 
-                                    <Tooltip title={file.sampleId}>
-                                      <TableCell  sx={{
-                                          maxWidth: 250,
-                                          whiteSpace: 'nowrap',
-                                          overflow: 'hidden',
-                                          textOverflow: 'ellipsis'
-                                      }}>{file.sampleId}</TableCell>
-                                    </Tooltip>
+                      </ToggleButtonGroup>
+                    </Box>
+                  </Box>
 
-                                    <Tooltip title={file.patientId}>
-                                      <TableCell  sx={{
-                                          maxWidth: 250,
-                                          whiteSpace: 'nowrap',
-                                          overflow: 'hidden',
-                                          textOverflow: 'ellipsis'
-                                      }}>{file.patientId}</TableCell>
-                                    </Tooltip>
+                  <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 539 }}>
+                    <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ width: '40%', fontWeight: 'bold' }} >Filename</TableCell>
+                          <TableCell sx={{ width: '25%', fontWeight: 'bold' }}>Sample ID</TableCell>
+                          <TableCell sx={{ width: '25%', fontWeight: 'bold' }}>Patient ID</TableCell>
+                          <TableCell sx={{ width: '40%', fontWeight: 'bold' }}>Location</TableCell>
+                          <TableCell sx={{ width: '20%', fontWeight: 'bold' }}>Size</TableCell>
+                          <TableCell sx={{ width: '10%', fontWeight: 'bold' }}>REDCap complete</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {filteredFiles && filteredFiles.length > 0 ? (
+                          filteredFiles.map((file) => (
+                            <TableRow key={file.id}>
+                              <Tooltip title={file.fileName}>
+                                <TableCell sx={{
+                                  maxWidth: 250,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>{file.fileName}</TableCell>
+                              </Tooltip>
 
-                                    <Tooltip title={file.organisation}>
-                                      <TableCell  sx={{
-                                          maxWidth: 250,
-                                          whiteSpace: 'nowrap',
-                                          overflow: 'hidden',
-                                          textOverflow: 'ellipsis'
-                                      }}>{file.organisation}</TableCell>
-                                    </Tooltip>
+                              <Tooltip title={file.sampleId}>
+                                <TableCell sx={{
+                                  maxWidth: 250,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>{file.sampleId}</TableCell>
+                              </Tooltip>
 
-                                    <Tooltip title={`${file.fileSize} ${dataFileUnit}`}>
-                                      <TableCell  sx={{
-                                          maxWidth: 250,
-                                          whiteSpace: 'nowrap',
-                                          overflow: 'hidden',
-                                          textOverflow: 'ellipsis'
-                                      }}>{file.fileSize} {dataFileUnit}</TableCell>
-                                    </Tooltip>
-                                    <TableCell>0</TableCell>
-                                </TableRow>
-                                ))    
-                              ) : (
-                                <TableRow>
-                                  <TableCell colSpan={6} align="center">
-                                    No files found.
-                                  </TableCell>
-                                </TableRow>
-                              )} 
-                            </TableBody>
-                            </Table>
-                        </TableContainer>
+                              <Tooltip title={file.patientId}>
+                                <TableCell sx={{
+                                  maxWidth: 250,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>{file.patientId}</TableCell>
+                              </Tooltip>
 
-                        
-                    </Paper>
-                    </Grid>
+                              <Tooltip title={file.organisation}>
+                                <TableCell sx={{
+                                  maxWidth: 250,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>{file.organisation}</TableCell>
+                              </Tooltip>
 
-                    <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <Paper sx={{ p: 4, flexGrow: 1 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{fileType} Data</Typography>
+                              <Tooltip title={`${file.fileSize} ${dataFileUnit}`}>
+                                <TableCell sx={{
+                                  maxWidth: 250,
+                                  whiteSpace: 'nowrap',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis'
+                                }}>{file.fileSize} {dataFileUnit}</TableCell>
+                              </Tooltip>
+                              <TableCell>0</TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={6} align="center">
+                              No files found.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
 
-                        {/* use the following line of code if there is an existing json file for TDE0001 */}
-                        {/*<Typography variant="body2">Located: WEHI Milton {dataset.data.location}</Typography> */}
 
-                        <Typography variant="body2">Located: WEHI Milton /vast/projects/TDE/TDE0001</Typography>
+                </Paper>
+              </Grid>
 
-                        <Divider sx={{ my: 2 }} />
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Copy code for raw data</Typography>
+              <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Paper sx={{ p: 4, flexGrow: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>{fileType} Data</Typography>
 
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleCopyPython}>WEHI Jupyter Notebook</Button>
+                  {/* use the following line of code if there is an existing json file for TDE0001 */}
+                  {/*<Typography variant="body2">Located: WEHI Milton {dataset.data.location}</Typography> */}
 
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleOpenSlurm}>SLURM pre-processing</Button>
-                        {/* Dialog (Popup) */}
-                        <Dialog open={slurmOpen} onClose={handleCloseSlurm} maxWidth="sm" fullWidth >
-                          
-                          <DialogContent>
-                            <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-                            <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center' }}>Run SLURM pre-processing</DialogTitle>
-                              <Typography variant="body1"><b>Run number:</b> TDE0001-002</Typography>
-                              <Typography variant="body1"><b>Pre-processing script:</b> /vast/projects/TDE/scripts/cfDNA_pre-processing.sh</Typography>
-                              <Typography variant="body1"><b>Directory:</b> /vast/projects/TDE/TDE0001</Typography>
-                              <Typography variant="body1"><b>Configuration file:</b> /vast/projects/TDE/TDE0001/pre-processing/TDE0001-002.ini</Typography>
-                              <Typography variant="body1"><b>Output directory:</b> /vast/projects/TDE/TDE0001/processed/TDE0001-002/</Typography>
-                              <Typography variant="body1"><b>Log file:</b> /vast/projects/TDE/TDE0001/processed/TDE0001-002/out.log</Typography>
-                            </Paper>
-                          </DialogContent>
+                  <Typography variant="body2">Located: WEHI Milton /vast/projects/TDE/TDE0001</Typography>
 
-                          {/* Close Button */}
-                          <DialogActions>
-                            <Button onClick={handleCloseSlurm} variant="contained" color="error">Close</Button>
-                          </DialogActions>
-                        </Dialog>
-                      
-                        <Button variant="outlined" sx={{ mt: 1 }} onClick={handleCopyR}>WEHI RStudio</Button>
-                        <Divider sx={{ my: 2 }} />
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Copy code for raw data</Typography>
 
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Data Portals</Typography>
+                  <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleCopyPython}>WEHI Jupyter Notebook</Button>
 
-                        {/* Link to Omero data portal - the '2' in the link is the project ID in Omero */}
-                        {/* This is for example to show how it links to Omero only, TDE0001 actually uses cBioPortal since it's genomic data. */}
-                        <Tooltip title="Omero">
-                          <Button variant="outlined" sx={{ mr: 2, mt: 1 }} component={Link} href="http://118.138.242.23:4080/webclient/?show=dataset-2" target="_blank">
-                            Omero
-                          </Button>
-                        </Tooltip>
-                        <Divider sx={{ my: 2 }} />
-                        
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Other views</Typography>
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/dashboard')}>All Samples View</Button>
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/datasets')}>All Datasets View</Button>
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/patients')}>All Samples Summary</Button>
+                  <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleOpenSlurm}>SLURM pre-processing</Button>
+                  {/* Dialog (Popup) */}
+                  <Dialog open={slurmOpen} onClose={handleCloseSlurm} maxWidth="sm" fullWidth >
 
-                        {/* hard coded */}
-                        <Button variant="outlined" sx={{ mt: 1 }} onClick={() => navigate('/dataset/details/BIOL10001')}>Files for this dataset</Button>
-                    </Paper>
-                    </Grid>
-                </Grid>
-                <Footer />
-            </Container>
+                    <DialogContent>
+                      <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+                        <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center' }}>Run SLURM pre-processing</DialogTitle>
+                        <Typography variant="body1"><b>Run number:</b> TDE0001-002</Typography>
+                        <Typography variant="body1"><b>Pre-processing script:</b> /vast/projects/TDE/scripts/cfDNA_pre-processing.sh</Typography>
+                        <Typography variant="body1"><b>Directory:</b> /vast/projects/TDE/TDE0001</Typography>
+                        <Typography variant="body1"><b>Configuration file:</b> /vast/projects/TDE/TDE0001/pre-processing/TDE0001-002.ini</Typography>
+                        <Typography variant="body1"><b>Output directory:</b> /vast/projects/TDE/TDE0001/processed/TDE0001-002/</Typography>
+                        <Typography variant="body1"><b>Log file:</b> /vast/projects/TDE/TDE0001/processed/TDE0001-002/out.log</Typography>
+                      </Paper>
+                    </DialogContent>
+
+                    {/* Close Button */}
+                    <DialogActions>
+                      <Button onClick={handleCloseSlurm} variant="contained" color="error">Close</Button>
+                    </DialogActions>
+                  </Dialog>
+
+                  <Button variant="outlined" sx={{ mt: 1 }} onClick={handleCopyR}>WEHI RStudio</Button>
+                  <Divider sx={{ my: 2 }} />
+
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Data Portals</Typography>
+
+                  {/* Link to Omero data portal - the '2' in the link is the project ID in Omero */}
+                  {/* This is for example to show how it links to Omero only, TDE0001 actually uses cBioPortal since it's genomic data. */}
+                  <Tooltip title="Omero">
+                    <Button variant="outlined" sx={{ mr: 2, mt: 1 }} component={Link} href="http://118.138.242.23:4080/webclient/?show=dataset-2" target="_blank">
+                      Omero
+                    </Button>
+                  </Tooltip>
+                  <Divider sx={{ my: 2 }} />
+
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Other views</Typography>
+                  <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/dashboard')}>All Samples View</Button>
+                  <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/datasets')}>All Datasets View</Button>
+                  <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/patients')}>All Samples Summary</Button>
+
+                  {/* hard coded */}
+                  <Button variant="outlined" sx={{ mt: 1 }} onClick={() => navigate('/dataset/details/BIOL10001')}>Files for this dataset</Button>
+                </Paper>
+              </Grid>
+            </Grid>
+            <Footer />
+          </Container>
 
         </Box>
       </Box>
