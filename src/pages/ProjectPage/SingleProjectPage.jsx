@@ -22,13 +22,12 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Title from '../../components/Dashboard/Title';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../actions/authActions';
 import { useNavigate, useParams } from 'react-router-dom';
 import { mainListItems, secondaryListItems } from '../../components/Dashboard/listItems';
 import Footer from '../../components/Footer';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
+import LogoutButton from '../../components/LogOutButton';
 
 const drawerWidth = 240;
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -105,7 +104,6 @@ export default function SingleProjectPage() {
   const [open, setOpen] = React.useState(false);
   const toggleDrawer = () => setOpen(!open);
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { projectId } = useParams();
   const id = Number(projectId);
@@ -134,10 +132,8 @@ export default function SingleProjectPage() {
     return () => { mounted = false; };
   }, [id]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
+  //   navigate('/login');
+  // };
 
   const projectTitle = summary?.project_name ? summary.project_name : `Project ${id}`;
 
@@ -171,14 +167,7 @@ export default function SingleProjectPage() {
             </div>
 
             <Box sx={{ marginRight: '10px' }}>
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={handleLogout}
-                sx={{ textTransform: 'none', px: 2.5, py: 0.75, fontSize: '16px', backgroundColor: '#00274D', '&:hover': { backgroundColor: '#0056b3' } }}
-              >
-                Log Out
-              </Button>
+              <LogoutButton />
             </Box>
             <IconButton color="inherit">
               <NotificationsIcon />

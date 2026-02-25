@@ -5,7 +5,8 @@ import viteLogo from '/vite.svg'
 import HomePage from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom';
 
 import AllDatasets from './pages/DatasetPage/AllDatasetsPage'
 import AllProjects from './pages/ProjectPage/AllProjectsPage'
@@ -25,106 +26,104 @@ import DatasetDetailsPage from './pages/DatasetPage/DatasetDetailsPage'
 function App() {
 
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />}/>
-        <Route path="/login" element={<LoginPage />} />
-        <Route 
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <AllProjects/>
-            </ProtectedRoute>
-          }
-        />
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <AllProjects />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Full Page */}
-        <Route
-          path="/datasets"
-          element={
-            <ProtectedRoute>
-              <AllDatasets/>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/projects"
-          element={
-            <ProtectedRoute>
-              <AllProjects/>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/patients"
-          element={
-            <ProtectedRoute>
-              <AllPatients/>
-            </ProtectedRoute>
-          }
-          />
-          <Route
-          path="/visualizations"
-          element={
-            <ProtectedRoute>
-              <Visualization />
-            </ProtectedRoute>
-          }
-        />
-        
-        <Route
-          path="/upload"
-          element={
-            <ProtectedRoute>
-              <UploadPage />
-            </ProtectedRoute>
-          }
-        />
+      {/* Full Page */}
+      <Route
+        path="/datasets"
+        element={
+          <ProtectedRoute>
+            <AllDatasets />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/projects"
+        element={
+          <ProtectedRoute>
+            <AllProjects />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/patients"
+        element={
+          <ProtectedRoute>
+            <AllPatients />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/visualizations"
+        element={
+          <ProtectedRoute>
+            <Visualization />
+          </ProtectedRoute>
+        }
+      />
 
-        <Route
-          path="/projectsummary"
-          element={
-            <ProtectedRoute>
-              <ProjectSummary />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/upload"
+        element={
+          <ProtectedRoute>
+            <UploadPage />
+          </ProtectedRoute>
+        }
+      />
 
-        {/* Single Page */}
-        <Route
-          path="/dataset/:id"
-          element={
-            <ProtectedRoute>
-              <SingleDatasetPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/patient/:id"
-          element={
-            <ProtectedRoute>
-              <SinglePatientPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/project/:projectId"
-          element={
-            <ProtectedRoute>
-              <SingleProjectPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/dataset/details/:id"
-          element={
-            <ProtectedRoute>
-              <DatasetDetailsPage />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
-    </Router>
+      <Route
+        path="/projectsummary"
+        element={
+          <ProtectedRoute>
+            <ProjectSummary />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Single Page */}
+      <Route
+        path="/dataset/:id"
+        element={
+          <ProtectedRoute>
+            <SingleDatasetPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/patient/:id"
+        element={
+          <ProtectedRoute>
+            <SinglePatientPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/project/:projectId"
+        element={
+          <ProtectedRoute>
+            <SingleProjectPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dataset/details/:id"
+        element={
+          <ProtectedRoute>
+            <DatasetDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
   );
 }
 

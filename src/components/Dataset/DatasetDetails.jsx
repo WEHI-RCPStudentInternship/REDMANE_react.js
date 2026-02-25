@@ -25,8 +25,6 @@ import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 import Tooltip from '@mui/material/Tooltip';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 
-import { useDispatch } from 'react-redux';
-// import { logout } from '../../actions/authActions'
 import dataset from '../../assets/testjson/output.json';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -103,7 +101,7 @@ export default function DatasetDetails() {
 
   const { id: dataset_id } = useParams();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const [fileType, setFileType] = useState('All');
   const [open, setOpen] = useState(false);
   const [slurmOpen, setSlurmOpen] = useState(false);
@@ -230,11 +228,6 @@ export default function DatasetDetails() {
       .catch(err => console.error("Failed to copy:", err));
   };
 
-  const handleLogout = () => {
-    dispatch(logout()); // Dispatch the logout action
-    navigate('/login'); // Redirect to the login page
-  };
-
   // Function to open the dialog
   const handleOpenSlurm = () => {
     setSlurmOpen(true);
@@ -301,22 +294,7 @@ export default function DatasetDetails() {
                 style={{ marginLeft: '2px', marginRight: '2px' }} />
             </div>
             <Box sx={{ marginRight: '10px' }}> {/* Adjust the marginLeft value as needed */}
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={handleLogout}
-                sx={{
-                  textTransform: 'none',
-                  padding: '5px 20px', // Increase padding for a bigger button
-                  fontSize: '16px', // Increase font size
-                  backgroundColor: '#00274D', // Choose a slightly darker or lighter shade of blue
-                  '&:hover': {
-                    backgroundColor: '#0056b3', // Darker shade for hover state
-                  },
-                }}
-              >
-                Log Out
-              </Button>
+              <LogoutButton />
             </Box>
             <IconButton color="inherit">
               <NotificationsIcon />

@@ -3,7 +3,7 @@ import { styled, createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
-import {Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert, Chip, Typography} from '@mui/material';
+import { Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar, Alert, Chip, Typography } from '@mui/material';
 import MuiAppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import List from '@mui/material/List';
@@ -21,13 +21,12 @@ import TablePagination from '@mui/material/TablePagination';
 import { mainListItems, secondaryListItems } from '../Dashboard/listItems';
 import Footer from '../Footer';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../actions/authActions';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
+import LogoutButton from '../LogOutButton';
 
 const drawerWidth = 240;
 const defaultTheme = createTheme();
@@ -97,7 +96,7 @@ export default function AllDatasets() {
   });
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const location = useLocation();
   const projectId = new URLSearchParams(location.search).get('project_id');
 
@@ -113,8 +112,8 @@ export default function AllDatasets() {
   const fetchDatasets = async () => {
     try {
       const url = projectId
-      ? `${BASE_URL}/datasets/?project_id=${projectId}`
-      : `${BASE_URL}/datasets/`;
+        ? `${BASE_URL}/datasets/?project_id=${projectId}`
+        : `${BASE_URL}/datasets/`;
 
       const res = await fetch(url);
 
@@ -132,11 +131,6 @@ export default function AllDatasets() {
     }
   };
 
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
 
   const handleViewDetails = (dId) => navigate(`/dataset/${dId}`);
   const handleChangePage = (event, newPage) => setPage(newPage);
@@ -189,7 +183,6 @@ export default function AllDatasets() {
       setLoading(false);
     }
   };
-
   return (
     <ThemeProvider theme={defaultTheme}>
       <Box sx={{ display: 'flex' }}>
@@ -210,9 +203,7 @@ export default function AllDatasets() {
               <img src={MelbUniLogo} alt="Melbourne University" width="30" height="30" />
             </div>
             <Box sx={{ marginRight: '10px' }}>
-              <Button variant="contained" color="warning" onClick={handleLogout} sx={{ textTransform: 'none', padding: '5px 20px', fontSize: '16px', backgroundColor: '#00274D' }}>
-                Log Out
-              </Button>
+              <LogoutButton />
             </Box>
             <IconButton color="inherit"><NotificationsIcon /></IconButton>
           </Toolbar>
@@ -316,20 +307,20 @@ export default function AllDatasets() {
                     )}
 
                     <Box sx={{ display: "flex", justifyContent: "flex-end", flexGrow: 1 }}>
-                    <TablePagination
-                      rowsPerPageOptions={[5, 10, 25]}
-                      component="div"
-                      count={datasetsWithRank.length}
-                      rowsPerPage={rowsPerPage}
-                      page={page}
-                      onPageChange={handleChangePage}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                      sx={{
-                        '& .MuiTablePagination-toolbar': { p: 0, minHeight: 36 },
-                        '& .MuiInputBase-root': { height: 36 },
-                      }}
-                    />
-                   </Box>
+                      <TablePagination
+                        rowsPerPageOptions={[5, 10, 25]}
+                        component="div"
+                        count={datasetsWithRank.length}
+                        rowsPerPage={rowsPerPage}
+                        page={page}
+                        onPageChange={handleChangePage}
+                        onRowsPerPageChange={handleChangeRowsPerPage}
+                        sx={{
+                          '& .MuiTablePagination-toolbar': { p: 0, minHeight: 36 },
+                          '& .MuiInputBase-root': { height: 36 },
+                        }}
+                      />
+                    </Box>
                   </Box>
                 </Paper>
               </Grid>
@@ -341,7 +332,7 @@ export default function AllDatasets() {
 
       {/* Dialog for Register */}
       <Dialog open={openRegister} onClose={handleCloseRegister} maxWidth="md" fullWidth>
-        <DialogTitle sx={{color: '#00274D' }}>Register New Dataset</DialogTitle>
+        <DialogTitle sx={{ color: '#00274D' }}>Register New Dataset</DialogTitle>
         <DialogContent dividers>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>

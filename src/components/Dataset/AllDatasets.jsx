@@ -30,36 +30,35 @@ import TableRow from '@mui/material/TableRow';
 import Title from '../../components/Dashboard/Title';
 import { useState } from 'react';
 import TablePagination from '@mui/material/TablePagination';
+import LogoutButton from '../LogOutButton';
 
-import { useDispatch } from 'react-redux';
-import { logout } from '../../actions/authActions'
 
 // Generate Order Data, this will be replaced with data from the backend
 function createData(id, dId, date, name, source) {
-    return { id, dId, date, name, source};
+  return { id, dId, date, name, source };
 }
 
 const rows = [
-    createData(5, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
-    createData(2, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
-    createData(10, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
-    createData(1, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
-    createData(12, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
-    createData(7, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
-    createData(14, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
-    createData(0, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
-    createData(9, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
-    createData(11, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
-    createData(6, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
-    createData(3, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
-    createData(4, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
-    createData(8, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
-    createData(13, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
-  ];
-  
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+  createData(5, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
+  createData(2, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
+  createData(10, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
+  createData(1, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
+  createData(12, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
+  createData(7, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
+  createData(14, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
+  createData(0, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
+  createData(9, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
+  createData(11, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
+  createData(6, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
+  createData(3, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
+  createData(4, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
+  createData(8, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
+  createData(13, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
+];
+
+function preventDefault(event) {
+  event.preventDefault();
+}
 
 function Copyright(props) {
   return (
@@ -125,20 +124,16 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function AllDatasets() {
-    
+
+  console.log("this renders");
+
   const [open, setOpen] = React.useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logout()); // Dispatch the logout action
-    navigate('/login'); // Redirect to the login page
-  };
-  
   const handleViewDetails = (dId) => {
     navigate(`/dataset/${dId}`); // Navigates to the project page with the dId
   };
@@ -186,44 +181,32 @@ export default function AllDatasets() {
             >
               All Datasets
             </Typography>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
-              <img src={WehiLogo} alt="WEHI" width="90" height="30" 
-                   style={{marginLeft: '10px', marginRight: '10px' }} />
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
+              <img src={WehiLogo} alt="WEHI" width="90" height="30"
+                style={{ marginLeft: '10px', marginRight: '10px' }} />
             </div>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
               <img src={MelbUniLogo} alt="Melbourne University" width="30" height="30"
-                   style={{marginLeft: '2px', marginRight: '2px' }} />
+                style={{ marginLeft: '2px', marginRight: '2px' }} />
             </div>
             <Box sx={{ marginRight: '10px' }}> {/* Adjust the marginLeft value as needed */}
-              <Button
-               variant="contained"
-               color="warning"
-               onClick={handleLogout}
-               sx={{ textTransform: 'none',
-                     padding: '5px 20px', // Increase padding for a bigger button
-                     fontSize: '16px', // Increase font size
-                     backgroundColor: '#00274D', // Choose a slightly darker or lighter shade of blue
-                    '&:hover': {
-                    backgroundColor: '#0056b3', // Darker shade for hover state
-                    }, 
-                  }}
-              >
-                Log Out
-              </Button>
+              <LogoutButton />
             </Box>
             <IconButton color="inherit">
               <NotificationsIcon />
@@ -267,53 +250,54 @@ export default function AllDatasets() {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                    <React.Fragment>
-                        <Title>Datasets</Title>
-                        <Table size="large">
-                        <TableHead>
-                            <TableRow>
-                            <TableCell>Dataset ID</TableCell>
-                            <TableCell>Date Uploaded</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Source</TableCell>
-                            <TableCell align="right">View Files</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                            <TableRow key={row.id}>
-                                <TableCell>{row.dId}</TableCell>
-                                <TableCell>{row.date}</TableCell>
-                                <TableCell>{row.name}</TableCell>
-                                <TableCell>{row.source}</TableCell>
-                                <TableCell align="right">
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    size="small"
-                                    onClick={() => handleViewDetails(row.dId)}
-                                    sx={{ textTransform: 'none',
-                                    padding: '5px 10px', // Increase padding for a bigger button
-                                    fontSize: '10px', // Increase font size
+                  <React.Fragment>
+                    <Title>Datasets</Title>
+                    <Table size="large">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>Dataset ID</TableCell>
+                          <TableCell>Date Uploaded</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Source</TableCell>
+                          <TableCell align="right">View Files</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                          <TableRow key={row.id}>
+                            <TableCell>{row.dId}</TableCell>
+                            <TableCell>{row.date}</TableCell>
+                            <TableCell>{row.name}</TableCell>
+                            <TableCell>{row.source}</TableCell>
+                            <TableCell align="right">
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                onClick={() => handleViewDetails(row.dId)}
+                                sx={{
+                                  textTransform: 'none',
+                                  padding: '5px 10px', // Increase padding for a bigger button
+                                  fontSize: '10px', // Increase font size
                                 }}
-                                >
-                                    View Files
-                                </Button>
-                                </TableCell>
-                            </TableRow>
-                            ))}
-                        </TableBody>
-                        </Table>
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            component="div"
-                            count={rows.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                        />
-                    </React.Fragment>
+                              >
+                                View Files
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    <TablePagination
+                      rowsPerPageOptions={[5, 10, 25]}
+                      component="div"
+                      count={rows.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                  </React.Fragment>
                 </Paper>
               </Grid>
             </Grid>
