@@ -33,6 +33,7 @@ import TablePagination from '@mui/material/TablePagination';
 import { Logout } from '@mui/icons-material';
 import LogoutButton from '../../components/LogOutButton';
 
+// import { logout } from '../../actions/authActions'
 
 
 // Generate Order Data, this will be replaced with data from the backend
@@ -148,8 +149,11 @@ export default function AllPatients() {
     setOpen(!open);
   };
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // const handleLogout = () => {
+  //   dispatch(logout()); // Dispatch the logout action
   //   navigate('/login'); // Redirect to the login page
   // };
 

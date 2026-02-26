@@ -25,12 +25,14 @@ import TableRow from '@mui/material/TableRow';
 import Title from '../../components/Dashboard/Title';
 import TablePagination from '@mui/material/TablePagination';
 import { useState, useEffect } from 'react';
+// import { useDispatch } from 'react-redux';
+// import { logout } from '../../actions/authActions';
 import { useNavigate } from 'react-router-dom';
 import { mainListItems, secondaryListItems } from '../../components/Dashboard/listItems';
 import Footer from '../../components/Footer';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
-import LogoutButton from '../../components/LogoutButton';
+import LogoutButton from '../../components/LogOutButton';
 
 const drawerWidth = 240;
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -94,8 +96,10 @@ export default function BackendProjects() {
     setOpen(!open);
   };
 
+  // const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // const handleLogout = () => {
   //   logout({ logoutParams: { returnTo: window.location.origin + '/login' } });
   // };
 

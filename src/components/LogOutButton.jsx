@@ -6,8 +6,6 @@ import { Button } from '@mui/material';
 const LogoutButton = () => {
   const { logout } = useAuth0();
 
-  console.log("LogoutButton rendered");
-
   return (
     <Button
       variant="contained"
