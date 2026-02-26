@@ -24,6 +24,8 @@ import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 import Tooltip from '@mui/material/Tooltip';
 import { ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { useFetch } from '../../utils/apiClient';
+import LogoutButton from '../LogOutButton';
 
 import dataset from '../../assets/testjson/output.json';
 
@@ -140,11 +142,12 @@ export default function DatasetDetails() {
       return flatFile;
     });
   };
+  const authFetch = useFetch();
 
   useEffect(() => {
     const fetchFilesForDataset = async () => {
       try {
-        const response = await fetch(`${BASE_URL}/dataset_files_metadata/${dataset_id}`);
+        const response = await authFetch(`${BASE_URL}/dataset_files_metadata/${dataset_id}`);
 
         const res = await response.json()
 

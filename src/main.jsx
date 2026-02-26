@@ -18,7 +18,8 @@ function Auth0ProviderWithNavigate({ children }) {
       domain="dev-6mdq3tdvjb04tojd.us.auth0.com"
       clientId="raZrj2RJz28jARpFHF3YzSVBB7sqGEvV"
       authorizationParams={{
-        redirect_uri: window.location.origin
+        redirect_uri: window.location.origin,
+        audience: 'redmane'
       }}
       onRedirectCallback={onRedirectCallback}
     >

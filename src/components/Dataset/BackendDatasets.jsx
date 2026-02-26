@@ -27,6 +27,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 import LogoutButton from '../LogOutButton';
+import { useFetch } from '../../utils/apiClient';
 
 const drawerWidth = 240;
 const defaultTheme = createTheme();
@@ -84,6 +85,8 @@ export default function AllDatasets() {
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ open: false, severity: 'success', message: '' });
 
+  const authFetch = useFetch();
+
   const [formData, setFormData] = useState({
     title: "",
     abstract: "",
@@ -115,7 +118,7 @@ export default function AllDatasets() {
         ? `${BASE_URL}/datasets/?project_id=${projectId}`
         : `${BASE_URL}/datasets/`;
 
-      const res = await fetch(url);
+      const res = await authFetch(url);
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -152,6 +155,7 @@ export default function AllDatasets() {
     formData.abstract.trim() !== "" &&
     formData.site.trim() !== "";
 
+
   const handleRegisterDataset = async () => {
     try {
       setLoading(true);
@@ -166,7 +170,7 @@ export default function AllDatasets() {
       if (formData.summary) form.append("summary_files", formData.summary);
       if (formData.readme) form.append("readme_files", formData.readme);
 
-      const response = await fetch(`${BASE_URL}/datasets/`, { method: "POST", body: form });
+      const response = await authFetch(`${BASE_URL}/datasets/`, { method: "POST", body: form });
       if (!response.ok) throw new Error("Failed to register dataset");
 
       const result = await response.json();

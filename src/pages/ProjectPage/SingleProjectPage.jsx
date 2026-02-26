@@ -28,6 +28,7 @@ import Footer from '../../components/Footer';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 import LogoutButton from '../../components/LogOutButton';
+import { useFetch } from '../../utils/apiClient';
 
 const drawerWidth = 240;
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -112,13 +113,14 @@ export default function SingleProjectPage() {
   const [error, setError] = React.useState(null);
   const [summary, setSummary] = React.useState(null); // { project_id, project_name, totals, datasets[] }
 
+  const authFetch = useFetch();
   React.useEffect(() => {
     let mounted = true;
     async function run() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch(`${BASE_URL}/projects/${id}/summary`);
+        const res = await authFetch(`${BASE_URL}/projects/${id}/summary`)
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         if (mounted) setSummary(data);

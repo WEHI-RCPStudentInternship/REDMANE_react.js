@@ -28,7 +28,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 import Button from '@mui/material/Button';
-import { Logout } from '@mui/icons-material';
+import { useFetch } from '../../utils/apiClient';
 
 import LogoutButton from '../../components/LogOutButton';
 
@@ -96,6 +96,8 @@ export default function AllPatients() {
     setOpen(!open);
   };
 
+  const authFetch = useFetch();
+
   useEffect(() => {
     const fetchPatients = async () => {
       try {
@@ -105,7 +107,7 @@ export default function AllPatients() {
         if (projectId) {
           url += `?project_id=${projectId}`;
         }
-        const response = await fetch(url);
+        const response = await authFetch(url);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
