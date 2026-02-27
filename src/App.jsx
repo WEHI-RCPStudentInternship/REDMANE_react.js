@@ -6,7 +6,7 @@ import HomePage from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { DashboardPage } from './pages/DashboardPage'
 // import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import AllDatasets from './pages/DatasetPage/AllDatasetsPage'
 import AllProjects from './pages/ProjectPage/AllProjectsPage'
@@ -27,7 +27,7 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
+      <Route path="/" element={<Navigate to="/login" />} />
       <Route path="/login" element={<LoginPage />} />
       <Route
         path="/dashboard"
