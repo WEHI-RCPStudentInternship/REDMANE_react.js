@@ -15,11 +15,11 @@ function Auth0ProviderWithNavigate({ children }) {
 
   return (
     <Auth0Provider
-      domain="dev-6mdq3tdvjb04tojd.us.auth0.com"
-      clientId="raZrj2RJz28jARpFHF3YzSVBB7sqGEvV"
+      domain={import.meta.env.VITE_AUTH0_DOMAIN}
+      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
       authorizationParams={{
         redirect_uri: window.location.origin,
-        audience: 'redmane'
+        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
       }}
       onRedirectCallback={onRedirectCallback}
     >

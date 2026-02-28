@@ -4,8 +4,10 @@ import { Navigate } from 'react-router-dom';
 
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading, error } = useAuth0();
 
+
+  console.log('protectedroute', { isAuthenticated, isLoading, error });
   if (isLoading) return <div>Loading...</div>;
 
   if (!isAuthenticated) {

@@ -6,7 +6,7 @@ export const useFetch = () => {
     const authFetch = async (url, options = {}) => {
         const token = await getAccessTokenSilently({
             authorizationParams: {
-                audience: 'redmane',
+                audience: import.meta.env.VITE_AUTH0_AUDIENCE,
             }
         });
         return fetch(url, {

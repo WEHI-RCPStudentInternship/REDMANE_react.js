@@ -25,8 +25,6 @@ import TableRow from '@mui/material/TableRow';
 import Title from '../../components/Dashboard/Title';
 import TablePagination from '@mui/material/TablePagination';
 import { useState, useEffect } from 'react';
-// import { useDispatch } from 'react-redux';
-// import { logout } from '../../actions/authActions';
 import { useNavigate } from 'react-router-dom';
 import { mainListItems, secondaryListItems } from '../../components/Dashboard/listItems';
 import Footer from '../../components/Footer';
@@ -98,12 +96,7 @@ export default function BackendProjects() {
     setOpen(!open);
   };
 
-  // const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // const handleLogout = () => {
-  //   logout({ logoutParams: { returnTo: window.location.origin + '/login' } });
-  // };
 
   const handleViewSummary = (projectId) => {
     navigate(`/project/${projectId}`);

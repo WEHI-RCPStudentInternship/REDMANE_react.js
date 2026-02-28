@@ -33,8 +33,6 @@ import TablePagination from '@mui/material/TablePagination';
 import { Logout } from '@mui/icons-material';
 import LogoutButton from '../../components/LogOutButton';
 
-// import { logout } from '../../actions/authActions'
-
 
 // Generate Order Data, this will be replaced with data from the backend
 function createData(id, eId, source, numSamples) {
