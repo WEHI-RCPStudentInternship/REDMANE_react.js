@@ -8,6 +8,7 @@ import { BrowserRouter, useNavigate } from 'react-router-dom';
 
 function Auth0ProviderWithNavigate({ children }) {
   const navigate = useNavigate();
+  console.log('ENV:', import.meta.env.VITE_AUTH0_DOMAIN, import.meta.env.VITE_AUTH0_CLIENT_ID);
 
   const onRedirectCallback = (appState) => {
     navigate(appState?.returnTo || '/projects');
