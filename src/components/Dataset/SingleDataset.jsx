@@ -24,38 +24,36 @@ import Footer from '../../components/Footer';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 import Tooltip from '@mui/material/Tooltip';
-
-import { useDispatch } from 'react-redux';
-import { logout } from '../../actions/authActions'
+import LogoutButton from '../LogOutButton';
 
 // Generate Order Data, this will be replaced with data from the backend
 function createData(id, dId, date, name, source) {
-    return { id, dId, date, name, source};
+  return { id, dId, date, name, source };
 }
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const rows = [
-    createData(5, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
-    createData(2, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
-    createData(10, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
-    createData(1, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
-    createData(12, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
-    createData(7, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
-    createData(14, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
-    createData(0, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
-    createData(9, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
-    createData(11, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
-    createData(6, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
-    createData(3, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
-    createData(4, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
-    createData(8, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
-    createData(13, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
-  ];
-  
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+  createData(5, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
+  createData(2, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
+  createData(10, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
+  createData(1, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
+  createData(12, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
+  createData(7, 'GENE10002', '16 Jun, 2024', 'BioSpectrum', 'cBioPortal'),
+  createData(14, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
+  createData(0, 'BIOL10001', '16 Aug, 2024', 'GeneFlow', 'University of Melbourne'),
+  createData(9, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
+  createData(11, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
+  createData(6, 'GENE10001', '26 Jun, 2024', 'VitalMetrics', 'University of Melbourne'),
+  createData(3, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
+  createData(4, 'GENE10003', '15 Apr, 2024', 'GenomicAtlas', 'USYD'),
+  createData(8, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
+  createData(13, 'BIOL10006', '16 May, 2024', 'CellBase', 'WEHI'),
+];
+
+function preventDefault(event) {
+  event.preventDefault();
+}
 
 function Copyright(props) {
   return (
@@ -123,7 +121,7 @@ const defaultTheme = createTheme();
 export default function SingleDataset() {
 
   const { id: datasetId } = useParams();
-  console.log(datasetId);  
+  console.log(datasetId);
   const [newFileOpen, setNewFileOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [slurmOpen, setSlurmOpen] = useState(false);
@@ -156,22 +154,22 @@ export default function SingleDataset() {
 
         const parseFiles = (val) =>
           val ? val.split(",").map((f) => f.trim()).filter(Boolean) : [];
-  
+
         setRawFiles(parseFiles(meta.raw_files));
         setProcessedFiles(parseFiles(meta.processed_files));
         setSummaryFiles(parseFiles(meta.summary_files));
         setReadmeFiles(parseFiles(meta.readme_files));
-  
+
       } catch (err) {
         console.error("Error fetching dataset:", err);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchDataset();
   }, [datasetId]);
-  
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -188,7 +186,7 @@ export default function SingleDataset() {
       summary_files = [${(summaryFiles ?? []).map(f => `'${f}'`).join(", ")}]
       summary_files = [${(readmeFiles ?? []).map(f => `'${f}'`).join(", ")}]
       `;
-  
+
   const rCode = `
       # Define the base path
       base_path <- "${rawDataLocation}"
@@ -250,7 +248,7 @@ export default function SingleDataset() {
     } finally {
       event.target.value = null;
     }
-  
+
   }
 
   const handleSelectFileClick = () => {
@@ -266,13 +264,7 @@ export default function SingleDataset() {
     setSummary(null);
   }
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    dispatch(logout()); // Dispatch the logout action
-    navigate('/login'); // Redirect to the login page
-  };
 
   // Function to open the dialog
   const handleOpenPop = () => {
@@ -324,44 +316,32 @@ export default function SingleDataset() {
               {/* Data Registry for Project {datasetData?.project_id || 1} */}
               TUFT Data Environment - Data Registry
             </Typography>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
-              <img src={WehiLogo} alt="WEHI" width="90" height="30" 
-                   style={{marginLeft: '10px', marginRight: '10px' }} />
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
+              <img src={WehiLogo} alt="WEHI" width="90" height="30"
+                style={{ marginLeft: '10px', marginRight: '10px' }} />
             </div>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
               <img src={MelbUniLogo} alt="Melbourne University" width="30" height="30"
-                   style={{marginLeft: '2px', marginRight: '2px' }} />
+                style={{ marginLeft: '2px', marginRight: '2px' }} />
             </div>
             <Box sx={{ marginRight: '10px' }}> {/* Adjust the marginLeft value as needed */}
-              <Button
-               variant="contained"
-               color="warning"
-               onClick={handleLogout}
-               sx={{ textTransform: 'none',
-                     padding: '5px 20px', // Increase padding for a bigger button
-                     fontSize: '16px', // Increase font size
-                     backgroundColor: '#00274D', // Choose a slightly darker or lighter shade of blue
-                    '&:hover': {
-                    backgroundColor: '#0056b3', // Darker shade for hover state
-                    }, 
-                  }}
-              >
-                Log Out
-              </Button>
+              <LogoutButton />
             </Box>
             <IconButton color="inherit">
               <NotificationsIcon />
@@ -402,111 +382,111 @@ export default function SingleDataset() {
         >
           <Toolbar />
           <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Grid container spacing={3}>
-                    
-                    {/* Left panel — dataset details */}
-                    <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <Paper sx={{ p: 4, flexGrow: 1 }}>
-                    {loading ? (
-                          <Typography>Loading dataset...</Typography>
-                        ) : (
-                          <>
-                            <Typography variant="h4" gutterBottom>
-                              {datasetData?.name || "Untitled Dataset"}
-                            </Typography>
+            <Grid container spacing={3}>
 
-                            <Typography variant="h6" sx={{ color: 'gray', lineHeight: '2' }} gutterBottom>
-                            {datasetData?.displayId || `P${datasetData?.project_id}-${String(datasetData?.id).padStart(3, '0')}`}
-                            </Typography>
+              {/* Left panel — dataset details */}
+              <Grid item xs={8} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Paper sx={{ p: 4, flexGrow: 1 }}>
+                  {loading ? (
+                    <Typography>Loading dataset...</Typography>
+                  ) : (
+                    <>
+                      <Typography variant="h4" gutterBottom>
+                        {datasetData?.name || "Untitled Dataset"}
+                      </Typography>
 
-                            <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line' }}>
-                              {datasetData?.abstract ||
-                                "No abstract provided for this dataset. Please update the record to include details."}
-                            </Typography>
+                      <Typography variant="h6" sx={{ color: 'gray', lineHeight: '2' }} gutterBottom>
+                        {datasetData?.displayId || `P${datasetData?.project_id}-${String(datasetData?.id).padStart(3, '0')}`}
+                      </Typography>
 
-                            <Button
-                              variant="outlined"
-                              sx={{ mr: 2, mt: 3 }}
-                              onClick={handleOpenNewFile}
-                            >
-                              Update Data Registry
-                            </Button>
-                          </>
-                        )}
+                      <Typography variant="body1" paragraph sx={{ whiteSpace: 'pre-line' }}>
+                        {datasetData?.abstract ||
+                          "No abstract provided for this dataset. Please update the record to include details."}
+                      </Typography>
+
+                      <Button
+                        variant="outlined"
+                        sx={{ mr: 2, mt: 3 }}
+                        onClick={handleOpenNewFile}
+                      >
+                        Update Data Registry
+                      </Button>
+                    </>
+                  )}
+                </Paper>
+              </Grid>
+
+              <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <Paper sx={{ p: 4, flexGrow: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Raw Data</Typography>
+
+                  {/* use the following line of code if there is an existing json file for TDE0001 */}
+                  {/*<Typography variant="body2">Located: WEHI Milton {dataset.data.location}</Typography> */}
+
+                  <Typography variant="body2">
+                    Located: {datasetData?.site || "Unknown site"} {rawDataLocation}
+                  </Typography>
+
+                  <Divider sx={{ my: 2 }} />
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Copy code for raw data</Typography>
+
+                  <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleCopyPython}>WEHI Jupyter Notebook</Button>
+
+                  <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleOpenPop}>SLURM pre-processing</Button>
+                  {/* Dialog (Popup) */}
+                  <Dialog open={slurmOpen} onClose={handleClosePop} maxWidth="sm" fullWidth >
+
+                    <DialogContent>
+                      <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
+                        <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center' }}>Run SLURM pre-processing</DialogTitle>
+                        <Typography variant="body1"><b>Run number:</b> TDE0005-002</Typography>
+                        <Typography variant="body1"><b>Pre-processing script:</b> /vast/projects/TDE/scripts/cfDNA_pre-processing.sh</Typography>
+                        <Typography variant="body1"><b>Directory:</b> /vast/projects/TDE/TDE0005</Typography>
+                        <Typography variant="body1"><b>Configuration file:</b> /vast/projects/TDE/TDE0005/pre-processing/TDE0005-002.ini</Typography>
+                        <Typography variant="body1"><b>Output directory:</b> /vast/projects/TDE/TDE0005/processed/TDE0005-002/</Typography>
+                        <Typography variant="body1"><b>Log file:</b> /vast/projects/TDE/TDE0005/processed/TDE0005-002/out.log</Typography>
                       </Paper>
-                    </Grid>
+                    </DialogContent>
 
-                    <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-                    <Paper sx={{ p: 4, flexGrow: 1 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Raw Data</Typography>
+                    {/* Close Button */}
+                    <DialogActions>
+                      <Button onClick={handleClosePop} variant="contained" color="error">Close</Button>
+                    </DialogActions>
+                  </Dialog>
 
-                        {/* use the following line of code if there is an existing json file for TDE0001 */}
-                        {/*<Typography variant="body2">Located: WEHI Milton {dataset.data.location}</Typography> */}
+                  <Button variant="outlined" sx={{ mt: 1 }} onClick={handleCopyR}>WEHI RStudio</Button>
+                  <Divider sx={{ my: 2 }} />
 
-                        <Typography variant="body2">
-                          Located: {datasetData?.site || "Unknown site"} {rawDataLocation}
-                        </Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Data Portals</Typography>
 
-                        <Divider sx={{ my: 2 }} />
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Copy code for raw data</Typography>
+                  {/* Link to Omero data portal - the '2' in the link is the project ID in Omero */}
+                  {/* This is for example to show how it links to Omero only, TDE0001 actually uses cBioPortal since it's genomic data. */}
+                  <Tooltip title="Omero">
+                    <Button variant="outlined" sx={{ mr: 2, mt: 1 }} component={Link} href="http://118.138.242.23:4080/webclient/?show=dataset-2" target="_blank">
+                      Omero
+                    </Button>
+                  </Tooltip>
+                  <Divider sx={{ my: 2 }} />
 
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleCopyPython}>WEHI Jupyter Notebook</Button>
+                  <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Other views</Typography>
+                  {/*<Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/dashboard')}>All Samples View</Button> */}
+                  <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/datasets')}>All Datasets View</Button>
+                  <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/patients')}>All Samples Summary</Button>
 
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={handleOpenPop}>SLURM pre-processing</Button>
-                        {/* Dialog (Popup) */}
-                        <Dialog open={slurmOpen} onClose={handleClosePop} maxWidth="sm" fullWidth >
-                          
-                          <DialogContent>
-                            <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-                            <DialogTitle sx={{ fontWeight: 'bold', textAlign: 'center' }}>Run SLURM pre-processing</DialogTitle>
-                              <Typography variant="body1"><b>Run number:</b> TDE0005-002</Typography>
-                              <Typography variant="body1"><b>Pre-processing script:</b> /vast/projects/TDE/scripts/cfDNA_pre-processing.sh</Typography>
-                              <Typography variant="body1"><b>Directory:</b> /vast/projects/TDE/TDE0005</Typography>
-                              <Typography variant="body1"><b>Configuration file:</b> /vast/projects/TDE/TDE0005/pre-processing/TDE0005-002.ini</Typography>
-                              <Typography variant="body1"><b>Output directory:</b> /vast/projects/TDE/TDE0005/processed/TDE0005-002/</Typography>
-                              <Typography variant="body1"><b>Log file:</b> /vast/projects/TDE/TDE0005/processed/TDE0005-002/out.log</Typography>
-                            </Paper>
-                          </DialogContent>
-
-                          {/* Close Button */}
-                          <DialogActions>
-                            <Button onClick={handleClosePop} variant="contained" color="error">Close</Button>
-                          </DialogActions>
-                        </Dialog>
-                      
-                        <Button variant="outlined" sx={{ mt: 1 }} onClick={handleCopyR}>WEHI RStudio</Button>
-                        <Divider sx={{ my: 2 }} />
-
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Data Portals</Typography>
-
-                        {/* Link to Omero data portal - the '2' in the link is the project ID in Omero */}
-                        {/* This is for example to show how it links to Omero only, TDE0001 actually uses cBioPortal since it's genomic data. */}
-                        <Tooltip title="Omero">
-                          <Button variant="outlined" sx={{ mr: 2, mt: 1 }} component={Link} href="http://118.138.242.23:4080/webclient/?show=dataset-2" target="_blank">
-                            Omero
-                          </Button>
-                        </Tooltip>
-                        <Divider sx={{ my: 2 }} />
-
-                        <Typography variant="h6" sx={{ fontWeight: 'bold' }}>Other views</Typography>
-                        {/*<Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/dashboard')}>All Samples View</Button> */}
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/datasets')}>All Datasets View</Button>
-                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/patients')}>All Samples Summary</Button>
-
-                        {/* hard coded */}
-                        <Button variant="outlined" sx={{ mt: 1 }} onClick={() => navigate(`/dataset/details/${datasetId}`)}>Files for this dataset</Button>
-                    </Paper>
-                    </Grid>
-                </Grid>
-                <Footer />
-            </Container>
+                  {/* hard coded */}
+                  <Button variant="outlined" sx={{ mt: 1 }} onClick={() => navigate(`/dataset/details/${datasetId}`)}>Files for this dataset</Button>
+                </Paper>
+              </Grid>
+            </Grid>
+            <Footer />
+          </Container>
 
         </Box>
       </Box>
 
       <Dialog open={newFileOpen} onClose={handleCloseUpdate} TransitionProps={{ onExited: handleResetDialog }}
-      fullWidth maxWidth='sm'>
-        <DialogTitle variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center', py: 4}}>
+        fullWidth maxWidth='sm'>
+        <DialogTitle variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center', py: 4 }}>
           {uploadStatus === 'IDLE' && "How to update Data Registry"}
           {uploadStatus === 'SUCCESS' && 'TDE0005 updated'}
           {uploadStatus === 'ERROR' && 'Upload error'}
@@ -514,15 +494,15 @@ export default function SingleDataset() {
         <DialogContent>
           {uploadStatus === 'IDLE' && (
             <>
-              <DialogContentText variant="body1" sx={{color: 'black'}}>
+              <DialogContentText variant="body1" sx={{ color: 'black' }}>
                 Go to {datasetData?.site || "Unknown site"} {rawDataLocation}
-                <br/><br/>
+                <br /><br />
                 You will need to run the update_local.sh script on the command line. <a href="https://github.com/lara-pawar/REDMANE-metadata-generator-with-RO-Crate" target='_blank'>[Click here if you need help]</a>
-                <br/><br/>
+                <br /><br />
                 This will create an output.html and output.json file.
-                <br/><br/>
+                <br /><br />
                 Once you run the script, please review the output.html file.
-                <br/><br/>
+                <br /><br />
                 Once you are satisfied that the html file is OK, click on the button below to upload output.json. You can also use
                 update_data_registry.sh to upload the output.json file
               </DialogContentText>
@@ -536,22 +516,22 @@ export default function SingleDataset() {
               />
 
               <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                <Button variant="outlined" onClick={handleSelectFileClick} sx={{ mt: 3, mb: 2}} >Upload output.json file</Button>
+                <Button variant="outlined" onClick={handleSelectFileClick} sx={{ mt: 3, mb: 2 }} >Upload output.json file</Button>
               </Box>
             </>
           )}
 
           {uploadStatus === 'SUCCESS' && (
             <>
-              <DialogContentText variant="body1" sx={{color: 'black'}}>
+              <DialogContentText variant="body1" sx={{ color: 'black' }}>
                 The Data Registry TDE0005 (id: {datasetId}) has been updated.
-                <br/><br/>
+                <br /><br />
                 {summary.raw_files.count} new raw files (*.fastq, *.fasta) were registed with {summary.raw_files.total_size}{summary.file_size_unit}
-                <br/><br/>
+                <br /><br />
                 {summary.processed_files.count} new processed files (*.cram, *.bam) were registed with {summary.processed_files.total_size}{summary.file_size_unit}
-                <br/><br/>
+                <br /><br />
                 {summary.summarised_files.count} new summarised files (*.vcf, *.maf) were registed with {summary.summarised_files.total_size}{summary.file_size_unit}
-                <br/><br/>
+                <br /><br />
                 Receipt number is 78746776433
               </DialogContentText>
 
@@ -563,7 +543,7 @@ export default function SingleDataset() {
 
           {uploadStatus === 'ERROR' && (
             <>
-              <DialogContentText variant="body1" sx={{color: 'black'}}>
+              <DialogContentText variant="body1" sx={{ color: 'black' }}>
                 Error uploading file. Make sure you are selecting the correct output.json file.
               </DialogContentText>
 

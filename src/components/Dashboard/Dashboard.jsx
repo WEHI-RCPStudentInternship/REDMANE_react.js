@@ -26,9 +26,7 @@ import Patients from '../Patient/Patients';
 import Footer from '../Footer';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
-
-import { useDispatch } from 'react-redux';
-import { logout } from '../../actions/authActions'
+import LogoutButton from '../LogOutButton';
 
 function Copyright(props) {
   return (
@@ -100,13 +98,10 @@ export default function Dashboard() {
     setOpen(!open);
   };
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logout()); // Dispatch the logout action
-    navigate('/login'); // Redirect to the login page
-  };
+  navigate('/login'); // Redirect to the login page
+
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -139,44 +134,50 @@ export default function Dashboard() {
             >
               Dashboard - Data Commons
             </Typography>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
-              <img src={WehiLogo} alt="WEHI" width="90" height="30" 
-                   style={{marginLeft: '10px', marginRight: '10px' }} />
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
+              <img src={WehiLogo} alt="WEHI" width="90" height="30"
+                style={{ marginLeft: '10px', marginRight: '10px' }} />
             </div>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
               <img src={MelbUniLogo} alt="Melbourne University" width="30" height="30"
-                   style={{marginLeft: '2px', marginRight: '2px' }} />
+                style={{ marginLeft: '2px', marginRight: '2px' }} />
             </div>
             <Box sx={{ marginRight: '10px' }}> {/* Adjust the marginLeft value as needed */}
-              <Button
-               variant="contained"
-               color="warning"
-               onClick={handleLogout}
-               sx={{ textTransform: 'none',
-                     padding: '5px 20px', // Increase padding for a bigger button
-                     fontSize: '16px', // Increase font size
-                     backgroundColor: '#00274D', // Choose a slightly darker or lighter shade of blue
-                    '&:hover': {
+              {/* <Button
+                variant="contained"
+                color="warning"
+                onClick={handleLogout}
+                sx={{
+                  textTransform: 'none',
+                  padding: '5px 20px', // Increase padding for a bigger button
+                  fontSize: '16px', // Increase font size
+                  backgroundColor: '#00274D', // Choose a slightly darker or lighter shade of blue
+                  '&:hover': {
                     backgroundColor: '#0056b3', // Darker shade for hover state
-                    }, 
-                  }}
+                  },
+                }}
               >
                 Log Out
-              </Button>
+              </Button> */}
+              <Box sx={{ marginRight: '10px' }}>
+                <LogoutButton />
+              </Box>
             </Box>
             <IconButton color="inherit">
               <NotificationsIcon />

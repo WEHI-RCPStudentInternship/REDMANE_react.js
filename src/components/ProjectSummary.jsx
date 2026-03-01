@@ -15,8 +15,8 @@ import Footer from './Footer';
 import WehiLogo from '../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../assets/logos/unimelb-logo.png';
 import { mainListItems, secondaryListItems } from '../components/Dashboard/listItems';
-import { useDispatch } from 'react-redux';
-import { logout } from '../actions/authActions';
+import LogoutButton from './LogOutButton';
+import { Logout } from '@mui/icons-material';
 
 const drawerWidth = 240;
 const AppBar = styled(MuiAppBar, { shouldForwardProp: (prop) => prop !== 'open' })(({ theme, open }) => ({
@@ -93,12 +93,9 @@ export default function ProjectSummary() {
   const [open, setOpen] = React.useState(false);
   const toggleDrawer = () => setOpen(!open);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
+  //   navigate('/login');
+  // };
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -114,7 +111,7 @@ export default function ProjectSummary() {
             </Typography>
             <img src={WehiLogo} alt="WEHI" width="90" height="30" style={{ marginRight: '10px' }} />
             <img src={MelbUniLogo} alt="Melbourne University" width="30" height="30" />
-            <Button variant="contained" color="warning" onClick={handleLogout} sx={{ ml: 2, textTransform: 'none' }}>Log Out</Button>
+            <LogoutButton />
             <IconButton color="inherit">
               <NotificationsIcon />
             </IconButton>
