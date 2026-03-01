@@ -92,6 +92,7 @@ export default function BackendProjects() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const authFetch = useFetch();
 
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -121,6 +122,7 @@ export default function BackendProjects() {
 
   useEffect(() => {
     const fetchProjects = async () => {
+      console.log('authFetch called');
       try {
         const response = await authFetch(`${BASE_URL}/projects/`);
         if (!response.ok) {

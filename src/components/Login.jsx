@@ -40,7 +40,11 @@ export default function SignIn() {
           <br />
           <Typography component="h1" variant="h5">Sign in</Typography>
           <Box sx={{ mt: 1, width: '100%' }}>
-            <Button fullWidth variant="contained" sx={{ mt: 1, mb: 2 }} onClick={() => auth.signinRedirect()}>
+            <Button fullWidth variant="contained" sx={{ mt: 1, mb: 2 }} onClick={() => {
+              console.log('signin clicked', auth.error);
+              console.log('auth error message:', auth.error?.message);
+              auth.signinRedirect()
+            }}>
               Sign In
             </Button>
             <Button fullWidth variant="contained" sx={{ mt: 1, mb: 2 }} onClick={() => auth.signinRedirect()}>

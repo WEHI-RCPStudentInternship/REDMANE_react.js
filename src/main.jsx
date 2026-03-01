@@ -7,8 +7,15 @@ import { BrowserRouter, useNavigate } from 'react-router-dom';
 
 function AuthProviderWithNavigate({ children }) {
   const navigate = useNavigate();
+  console.log('OIDC config:', {
+    authority: import.meta.env.VITE_OIDC_AUTHORITY,
+    client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
+  });
+
+  console.log('redirect_uri:', window.location.origin);
 
   const oidcConfig = {
+
     authority: import.meta.env.VITE_OIDC_AUTHORITY,
     client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
     redirect_uri: window.location.origin,
