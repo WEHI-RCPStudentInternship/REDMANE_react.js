@@ -1,36 +1,31 @@
 import * as React from 'react';
 import { useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth } from 'react-oidc-context';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import WehiLogo from '../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../assets/logos/unimelb-logo.png';
 import BusinessIcon from '@mui/icons-material/Business';
 import Footer from './Footer';
 import { useNavigate } from 'react-router-dom';
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
-// import { login } from '../actions/authActions';  // Import login action
-
 
 const defaultTheme = createTheme()
 
 export default function SignIn() {
-  const { loginWithRedirect, isAuthenticated } = useAuth0();
+  const auth = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (auth.isAuthenticated) {
       navigate('/projects');
     }
-  }, [isAuthenticated]);
+  }, [auth.isAuthenticated]);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -45,10 +40,10 @@ export default function SignIn() {
           <br />
           <Typography component="h1" variant="h5">Sign in</Typography>
           <Box sx={{ mt: 1, width: '100%' }}>
-            <Button fullWidth variant="contained" sx={{ mt: 1, mb: 2 }} onClick={() => loginWithRedirect()}>
+            <Button fullWidth variant="contained" sx={{ mt: 1, mb: 2 }} onClick={() => auth.signinRedirect()}>
               Sign In
             </Button>
-            <Button fullWidth variant="contained" sx={{ mt: 1, mb: 2 }} onClick={() => loginWithRedirect()}>
+            <Button fullWidth variant="contained" sx={{ mt: 1, mb: 2 }} onClick={() => auth.signinRedirect()}>
               <BusinessIcon sx={{ mr: 1 }} />
               Sign In Through Your Institution
             </Button>

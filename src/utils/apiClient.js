@@ -1,14 +1,10 @@
-import { useAuth0 } from '@auth0/auth0-react';
+import { useAuth } from 'react-oidc-context'
 
 export const useFetch = () => {
-    const { getAccessTokenSilently } = useAuth0();
+    const auth = useAuth();
 
     const authFetch = async (url, options = {}) => {
-        const token = await getAccessTokenSilently({
-            authorizationParams: {
-                audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-            }
-        });
+        const token = auth.user?.access_token;
         return fetch(url, {
             ...options,
             headers: {

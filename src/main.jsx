@@ -2,40 +2,33 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
-// import { Provider } from 'react-redux';
-import { Auth0Provider } from '@auth0/auth0-react';
+import { AuthProvider } from 'react-oidc-context';
 import { BrowserRouter, useNavigate } from 'react-router-dom';
 
-function Auth0ProviderWithNavigate({ children }) {
+function AuthProviderWithNavigate({ children }) {
   const navigate = useNavigate();
 
-  const onRedirectCallback = (appState) => {
-    navigate(appState?.returnTo || '/projects');
+  const oidcConfig = {
+    authority: import.meta.env.VITE_OIDC_AUTHORITY,
+    client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
+    redirect_uri: window.location.origin,
+    scope: 'openid profile email',
+    extraQueryParams: {
+      audience: import.meta.env.VITE_OIDC_AUDIENCE
+    },
+    onSigninCallback: () => {
+      window.history.replaceState({}, document.title, '/');
+    },
   };
-
-  return (
-    <Auth0Provider
-      domain={import.meta.env.VITE_AUTH0_DOMAIN}
-      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
-      authorizationParams={{
-        redirect_uri: window.location.origin,
-        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-      }}
-      onRedirectCallback={onRedirectCallback}
-    >
-      {children}
-    </Auth0Provider>
-  );
+  return <AuthProvider {...oidcConfig}>{children}</AuthProvider>
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <Auth0ProviderWithNavigate>
-        {/* <Provider store={store}> */}
+      <AuthProviderWithNavigate>
         <App />
-        {/* </Provider> */}
-      </Auth0ProviderWithNavigate>
+      </AuthProviderWithNavigate>
     </BrowserRouter>
   </React.StrictMode>
 );
