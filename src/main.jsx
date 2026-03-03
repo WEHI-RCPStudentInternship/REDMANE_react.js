@@ -1,22 +1,41 @@
 import React from 'react';
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
 import ReactDOM from 'react-dom/client';
-import './index.css'
-import { Provider } from 'react-redux';
-import store from './store';
+import App from './App.jsx';
+import './index.css';
+import { AuthProvider } from 'react-oidc-context';
+import { BrowserRouter, useNavigate } from 'react-router-dom';
 
-// ReactDOM.createRoot(document.getElementById('root')).render(
-//   <React.StrictMode>
-//     <App />
-//   </React.StrictMode>
-// );
+function AuthProviderWithNavigate({ children }) {
+  const navigate = useNavigate();
+  console.log('OIDC config:', {
+    authority: import.meta.env.VITE_OIDC_AUTHORITY,
+    client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
+  });
+
+  console.log('redirect_uri:', window.location.origin);
+
+  const oidcConfig = {
+
+    authority: import.meta.env.VITE_OIDC_AUTHORITY,
+    client_id: import.meta.env.VITE_OIDC_CLIENT_ID,
+    redirect_uri: window.location.origin,
+    scope: 'openid profile email',
+    extraQueryParams: {
+      audience: import.meta.env.VITE_OIDC_AUDIENCE
+    },
+    onSigninCallback: () => {
+      window.history.replaceState({}, document.title, '/');
+    },
+  };
+  return <AuthProvider {...oidcConfig}>{children}</AuthProvider>
+}
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
+    <BrowserRouter>
+      <AuthProviderWithNavigate>
+        <App />
+      </AuthProviderWithNavigate>
+    </BrowserRouter>
   </React.StrictMode>
 );

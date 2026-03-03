@@ -25,13 +25,13 @@ import TableRow from '@mui/material/TableRow';
 import Title from '../../components/Dashboard/Title';
 import TablePagination from '@mui/material/TablePagination';
 import { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../actions/authActions';
 import { useNavigate } from 'react-router-dom';
 import { mainListItems, secondaryListItems } from '../../components/Dashboard/listItems';
 import Footer from '../../components/Footer';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
+import LogoutButton from '../../components/LogOutButton';
+import { useFetch } from '../../utils/apiClient';
 
 const drawerWidth = 240;
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -90,18 +90,14 @@ export default function BackendProjects() {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const authFetch = useFetch();
+
 
   const toggleDrawer = () => {
     setOpen(!open);
   };
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
 
   const handleViewSummary = (projectId) => {
     navigate(`/project/${projectId}`);
@@ -126,8 +122,9 @@ export default function BackendProjects() {
 
   useEffect(() => {
     const fetchProjects = async () => {
+      console.log('authFetch called');
       try {
-        const response = await fetch(`${BASE_URL}/projects/`);
+        const response = await authFetch(`${BASE_URL}/projects/`);
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
@@ -162,37 +159,32 @@ export default function BackendProjects() {
             <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
               All Projects
             </Typography>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
-              <img src={WehiLogo} alt="WEHI" width="90" height="30" 
-                   style={{marginLeft: '10px', marginRight: '10px' }} />
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
+              <img src={WehiLogo} alt="WEHI" width="90" height="30"
+                style={{ marginLeft: '10px', marginRight: '10px' }} />
             </div>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
               <img src={MelbUniLogo} alt="Melbourne University" width="30" height="30"
-                   style={{marginLeft: '2px', marginRight: '2px' }} />
+                style={{ marginLeft: '2px', marginRight: '2px' }} />
             </div>
             <Box sx={{ marginRight: '10px' }}>
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={handleLogout}
-                sx={{ textTransform: 'none', padding: '5px 20px', fontSize: '16px', backgroundColor: '#00274D', '&:hover': { backgroundColor: '#0056b3' } }}
-              >
-                Log Out
-              </Button>
+              <LogoutButton />
             </Box>
             <IconButton color="inherit">
               <NotificationsIcon />
@@ -227,56 +219,56 @@ export default function BackendProjects() {
                     ) : (
                       <Table size="large">
                         <TableHead>
-                        <TableRow>
+                          <TableRow>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Project ID</TableCell>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Name</TableCell>
                             <TableCell align="left" sx={{ fontWeight: 'bold' }}>Status</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Summary</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Datasets</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>View Patients</TableCell>
-                        </TableRow>
+                          </TableRow>
                         </TableHead>
                         <TableBody>
-                        {projects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((project) => (
+                          {projects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((project) => (
                             <TableRow key={project.id}>
-                            <TableCell align="left">{project.id}</TableCell>
-                            <TableCell align="left">{project.name}</TableCell>
-                            <TableCell align="left">{project.status}</TableCell>
-                            <TableCell align="right">
+                              <TableCell align="left">{project.id}</TableCell>
+                              <TableCell align="left">{project.name}</TableCell>
+                              <TableCell align="left">{project.status}</TableCell>
+                              <TableCell align="right">
                                 <Button
-                                variant="contained"
-                                color="info"
-                                size="small"
-                                onClick={() => handleViewSummary(project.id)}
-                                sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
+                                  variant="contained"
+                                  color="info"
+                                  size="small"
+                                  onClick={() => handleViewSummary(project.id)}
+                                  sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
                                 >
-                                View Summary
+                                  View Summary
                                 </Button>
-                            </TableCell>
-                            <TableCell align="right">
+                              </TableCell>
+                              <TableCell align="right">
                                 <Button
-                                variant="contained"
-                                color="primary"
-                                size="small"
-                                onClick={() => handleViewDatasets(project.id)}
-                                sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
+                                  variant="contained"
+                                  color="primary"
+                                  size="small"
+                                  onClick={() => handleViewDatasets(project.id)}
+                                  sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
                                 >
-                                View Datasets
+                                  View Datasets
                                 </Button>
-                            </TableCell>
-                            <TableCell align="right">
+                              </TableCell>
+                              <TableCell align="right">
                                 <Button
-                                variant="contained"
-                                color="success"
-                                size="small"
-                                onClick={() => handleViewPatients(project.id)}
-                                sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
+                                  variant="contained"
+                                  color="success"
+                                  size="small"
+                                  onClick={() => handleViewPatients(project.id)}
+                                  sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
                                 >
-                                View Patients
+                                  View Patients
                                 </Button>
-                            </TableCell>
+                              </TableCell>
                             </TableRow>
-                        ))}
+                          ))}
                         </TableBody>
                       </Table>
                     )}

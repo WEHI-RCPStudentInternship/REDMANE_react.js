@@ -30,14 +30,13 @@ import TableRow from '@mui/material/TableRow';
 import Title from '../../components/Dashboard/Title';
 import { useState } from 'react';
 import TablePagination from '@mui/material/TablePagination';
-
-import { useDispatch } from 'react-redux';
-import { logout } from '../../actions/authActions'
+import { Logout } from '@mui/icons-material';
+import LogoutButton from '../../components/LogOutButton';
 
 
 // Generate Order Data, this will be replaced with data from the backend
 function createData(id, eId, source, numSamples) {
-  return { id, eId, source, numSamples};
+  return { id, eId, source, numSamples };
 }
 
 const rows = [
@@ -52,14 +51,14 @@ const rows = [
     'UOM_123',
     'University of Melbourne',
     2,
-    
+
   ),
   createData(
     2,
-    'CBP-369', 
+    'CBP-369',
     'cBioPortal',
     3,
-    ),
+  ),
   createData(
     3,
     'WH_211',
@@ -73,10 +72,10 @@ const rows = [
     1,
   ),
 ];
-  
-  function preventDefault(event) {
-    event.preventDefault();
-  }
+
+function preventDefault(event) {
+  event.preventDefault();
+}
 
 function Copyright(props) {
   return (
@@ -142,7 +141,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const defaultTheme = createTheme();
 
 export default function AllPatients() {
-    
+
   const [open, setOpen] = React.useState(false);
   const toggleDrawer = () => {
     setOpen(!open);
@@ -151,12 +150,12 @@ export default function AllPatients() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    dispatch(logout()); // Dispatch the logout action
-    navigate('/login'); // Redirect to the login page
-  };
+  // const handleLogout = () => {
+  //   dispatch(logout()); // Dispatch the logout action
+  //   navigate('/login'); // Redirect to the login page
+  // };
 
-  
+
   const handleViewDetails = (eId) => {
     navigate(`/patient/${eId}`); // Navigates to the project page with the dId
   };
@@ -204,44 +203,32 @@ export default function AllPatients() {
             >
               All Patients
             </Typography>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
-              <img src={WehiLogo} alt="WEHI" width="90" height="30" 
-                   style={{marginLeft: '10px', marginRight: '10px' }} />
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
+              <img src={WehiLogo} alt="WEHI" width="90" height="30"
+                style={{ marginLeft: '10px', marginRight: '10px' }} />
             </div>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)' ,
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
               <img src={MelbUniLogo} alt="Melbourne University" width="30" height="30"
-                   style={{marginLeft: '2px', marginRight: '2px' }} />
+                style={{ marginLeft: '2px', marginRight: '2px' }} />
             </div>
             <Box sx={{ marginRight: '10px' }}> {/* Adjust the marginLeft value as needed */}
-              <Button
-               variant="contained"
-               color="warning"
-               onClick={handleLogout}
-               sx={{ textTransform: 'none',
-                     padding: '5px 20px', // Increase padding for a bigger button
-                     fontSize: '16px', // Increase font size
-                     backgroundColor: '#00274D', // Choose a slightly darker or lighter shade of blue
-                    '&:hover': {
-                    backgroundColor: '#0056b3', // Darker shade for hover state
-                    }, 
-                  }}
-              >
-                Log Out
-              </Button>
+              <LogoutButton />
             </Box>
             <IconButton color="inherit">
               <NotificationsIcon />
@@ -285,53 +272,54 @@ export default function AllPatients() {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                    <React.Fragment>
-                        <Title>Patients</Title>
-                        <Table size="large">
-                        <TableHead>
-                            <TableRow>
-                            <TableCell align='center'>ID</TableCell>
-                            <TableCell align='center'>External ID</TableCell>
-                            <TableCell>Source</TableCell>
-                            <TableCell align='center'>Number of Samples</TableCell>
-                            <TableCell align="right">View Details</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
-                            <TableRow key={row.id}>
-                                <TableCell align='center'>{row.id}</TableCell>
-                                <TableCell align='center'>{row.eId}</TableCell>
-                                <TableCell>{row.source}</TableCell>
-                                <TableCell align='center'>{row.numSamples}</TableCell>
-                                <TableCell align="right">
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    size="small"
-                                    onClick={() => handleViewDetails(row.eId)}
-                                    sx={{ textTransform: 'none',
-                                    padding: '5px 10px', // Increase padding for a bigger button
-                                    fontSize: '10px', // Increase font size
+                  <React.Fragment>
+                    <Title>Patients</Title>
+                    <Table size="large">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell align='center'>ID</TableCell>
+                          <TableCell align='center'>External ID</TableCell>
+                          <TableCell>Source</TableCell>
+                          <TableCell align='center'>Number of Samples</TableCell>
+                          <TableCell align="right">View Details</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                          <TableRow key={row.id}>
+                            <TableCell align='center'>{row.id}</TableCell>
+                            <TableCell align='center'>{row.eId}</TableCell>
+                            <TableCell>{row.source}</TableCell>
+                            <TableCell align='center'>{row.numSamples}</TableCell>
+                            <TableCell align="right">
+                              <Button
+                                variant="contained"
+                                color="primary"
+                                size="small"
+                                onClick={() => handleViewDetails(row.eId)}
+                                sx={{
+                                  textTransform: 'none',
+                                  padding: '5px 10px', // Increase padding for a bigger button
+                                  fontSize: '10px', // Increase font size
                                 }}
-                                >
-                                    View Details
-                                </Button>
-                                </TableCell>
-                            </TableRow>
-                            ))}
-                        </TableBody>
-                        </Table>
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            component="div"
-                            count={rows.length}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={handleChangePage}
-                            onRowsPerPageChange={handleChangeRowsPerPage}
-                        />
-                    </React.Fragment>
+                              >
+                                View Details
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                    <TablePagination
+                      rowsPerPageOptions={[5, 10, 25]}
+                      component="div"
+                      count={rows.length}
+                      rowsPerPage={rowsPerPage}
+                      page={page}
+                      onPageChange={handleChangePage}
+                      onRowsPerPageChange={handleChangeRowsPerPage}
+                    />
+                  </React.Fragment>
                 </Paper>
               </Grid>
             </Grid>

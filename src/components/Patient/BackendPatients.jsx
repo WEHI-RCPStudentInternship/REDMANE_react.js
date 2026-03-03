@@ -22,14 +22,15 @@ import Title from '../../components/Dashboard/Title';
 import { mainListItems, secondaryListItems } from '../../components/Dashboard/listItems';
 import Footer from '../../components/Footer';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { logout } from '../../actions/authActions';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import WehiLogo from '../../assets/logos/wehi-logo.png';
 import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 import Button from '@mui/material/Button';
+import { useFetch } from '../../utils/apiClient';
+
+import LogoutButton from '../../components/LogOutButton';
 
 const drawerWidth = 240;
 const defaultTheme = createTheme();
@@ -80,14 +81,13 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-export default function AllPatients(){
+export default function AllPatients() {
   const [open, setOpen] = useState(false);
   const [patients, setPatients] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const location = useLocation();
 
   const projectId = new URLSearchParams(location.search).get('project_id');
@@ -95,6 +95,8 @@ export default function AllPatients(){
   const toggleDrawer = () => {
     setOpen(!open);
   };
+
+  const authFetch = useFetch();
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -105,7 +107,7 @@ export default function AllPatients(){
         if (projectId) {
           url += `?project_id=${projectId}`;
         }
-        const response = await fetch(url);
+        const response = await authFetch(url);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -121,10 +123,8 @@ export default function AllPatients(){
     fetchPatients();
   }, [projectId]);
 
-  const handleLogout = () => {
-    dispatch(logout());
-    navigate('/login');
-  };
+  //   navigate('/login');
+  // };
 
   const handleViewDetails = (pId) => {
     navigate(`/patient/${pId}`);
@@ -151,32 +151,32 @@ export default function AllPatients(){
             <Typography component="h1" variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>
               {projectId ? `Patients for Project ${projectId}` : 'All Patients'}
             </Typography>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)',
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
-              <img src={WehiLogo} alt="WEHI" width="90" height="30" 
-                   style={{marginLeft: '10px', marginRight: '10px' }} />
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
+              <img src={WehiLogo} alt="WEHI" width="90" height="30"
+                style={{ marginLeft: '10px', marginRight: '10px' }} />
             </div>
-            <div style={{ display: 'flex', 
-                          alignItems: 'center',
-                          backgroundColor: 'rgba(255, 255, 255, 1)',
-                          padding: '5px',
-                          borderRadius: '5px',
-                          alignSelf: 'center',
-                          marginRight: '10px'
-                          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              backgroundColor: 'rgba(255, 255, 255, 1)',
+              padding: '5px',
+              borderRadius: '5px',
+              alignSelf: 'center',
+              marginRight: '10px'
+            }}>
               <img src={MelbUniLogo} alt="Melbourne University" width="30" height="30"
-                   style={{marginLeft: '2px', marginRight: '2px' }} />
+                style={{ marginLeft: '2px', marginRight: '2px' }} />
             </div>
             <Box sx={{ marginRight: '10px' }}>
-              <Button variant="contained" color="warning" onClick={handleLogout} sx={{ textTransform: 'none', padding: '5px 20px', fontSize: '16px', backgroundColor: '#00274D' }}>
-                Log Out
-              </Button>
+              <LogoutButton />
             </Box>
             <IconButton color="inherit">
               <NotificationsIcon />
@@ -230,30 +230,30 @@ export default function AllPatients(){
                               color="primary"
                               size="small"
                               onClick={() => handleViewDetails(patient.id)}
-                              >
-                                View
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                    <TablePagination
-                      rowsPerPageOptions={[10, 25, 50]}
-                      component="div"
-                      count={patients.length}
-                      rowsPerPage={rowsPerPage}
-                      page={page}
-                      onPageChange={handleChangePage}
-                      onRowsPerPageChange={handleChangeRowsPerPage}
-                    />
-                  </Paper>
-                </Grid>
+                            >
+                              View
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  <TablePagination
+                    rowsPerPageOptions={[10, 25, 50]}
+                    component="div"
+                    count={patients.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                  />
+                </Paper>
               </Grid>
-              <Footer />
-            </Container>
-          </Box>
+            </Grid>
+            <Footer />
+          </Container>
         </Box>
-      </ThemeProvider>
-    );
-  }
+      </Box>
+    </ThemeProvider>
+  );
+}

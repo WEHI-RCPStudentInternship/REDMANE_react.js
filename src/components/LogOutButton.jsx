@@ -1,21 +1,26 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { logout } from '../actions/authActions';
+import { useAuth } from 'react-oidc-context';
+import { Button } from '@mui/material';
 
 const LogoutButton = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    dispatch(logout()); // Dispatch the logout action
-    navigate('/login'); // Redirect to the login page
-  };
+  const auth = useAuth();
 
   return (
-    <button onClick={handleLogout}>
+    <Button
+      variant="conteined"
+      onClick={() => auth.signoutRedirect({
+        post_logout_redirect_uri: window.location.origin + '/login'
+      })}
+      sx={{
+        textTransform: 'none',
+        padding: '5px 20px',
+        fontSize: '16px',
+        backgroundColor: '#00274D',
+        '&:hover': { backgroundColor: '#0056b3' },
+      }}
+    >
       Log Out
-    </button>
+    </Button>
   );
 };
 
