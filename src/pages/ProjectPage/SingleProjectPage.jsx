@@ -280,7 +280,7 @@ export default function SingleProjectPage() {
                         <TableBody>
                           {summary.datasets.map((d) => (
                             <TableRow key={d.dataset_id}>
-                              <TableCell>{d.dataset_name}</TableCell>
+                              <TableCell><a href={`/dataset/${d.dataset_id}`}>{d.dataset_name}</a></TableCell>
                               <TableCell align="right">{d.file_count}</TableCell>
                               <TableCell align="right">{d.patient_count}</TableCell>
                               <TableCell align="right">{d.sample_count}</TableCell>
