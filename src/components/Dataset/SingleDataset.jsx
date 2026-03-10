@@ -492,6 +492,8 @@ export default function SingleDataset() {
                         {/*<Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/dashboard')}>All Samples View</Button> */}
                         <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/datasets')}>All Datasets View</Button>
                         <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate('/patients')}>All Samples Summary</Button>
+                        <Button variant="outlined" sx={{ mr: 2, mt: 1 }} onClick={() => navigate(`/project/${datasetData.project_id}`)}>Go to Project</Button>
+
 
                         {/* hard coded */}
                         <Button variant="outlined" sx={{ mt: 1 }} onClick={() => navigate(`/dataset/details/${datasetId}`)}>Files for this dataset</Button>
