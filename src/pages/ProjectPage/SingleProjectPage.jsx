@@ -33,6 +33,7 @@ import MelbUniLogo from '../../assets/logos/unimelb-logo.png';
 const drawerWidth = 240;
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
+
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
@@ -113,6 +114,12 @@ export default function SingleProjectPage() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState(null);
   const [summary, setSummary] = React.useState(null); // { project_id, project_name, totals, datasets[] }
+
+    const handleViewDataset = (datasetId) => {
+      navigate(`/dataset/${datasetId}`);
+    };
+
+
 
   React.useEffect(() => {
     let mounted = true;
@@ -271,6 +278,7 @@ export default function SingleProjectPage() {
                         <TableHead>
                           <TableRow>
                             <TableCell sx={{ fontWeight: 'bold' }}>Dataset Name</TableCell>
+                            <TableCell align="right" sx={{ fontWeight: 'bold' }}>Dataset Page</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>Number of Files</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>Number of Patients</TableCell>
                             <TableCell align="right" sx={{ fontWeight: 'bold' }}>Number of Samples</TableCell>
@@ -280,7 +288,20 @@ export default function SingleProjectPage() {
                         <TableBody>
                           {summary.datasets.map((d) => (
                             <TableRow key={d.dataset_id}>
-                              <TableCell><a href={`/dataset/${d.dataset_id}`}>{d.dataset_name}</a></TableCell>
+                              <TableCell>{d.dataset_name}</TableCell>
+                              <TableCell align="right">
+                                  <Button
+                                  variant="contained"
+                                  color="success"
+                                  size="small"
+                                  onClick={() => handleViewDataset(d.dataset_id)}
+                                  sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
+                                  >
+                                  View Dataset
+                                  </Button>
+                              </TableCell>
+     
+
                               <TableCell align="right">{d.file_count}</TableCell>
                               <TableCell align="right">{d.patient_count}</TableCell>
                               <TableCell align="right">{d.sample_count}</TableCell>
