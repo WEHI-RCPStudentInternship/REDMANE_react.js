@@ -292,7 +292,7 @@ export default function SingleProjectPage() {
                               <TableCell align="right">
                                   <Button
                                   variant="contained"
-                                  color="success"
+                                  color="primary"
                                   size="small"
                                   onClick={() => handleViewDataset(d.dataset_id)}
                                   sx={{ textTransform: 'none', padding: '5px 10px', fontSize: '10px' }}
