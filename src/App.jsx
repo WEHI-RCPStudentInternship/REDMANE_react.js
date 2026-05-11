@@ -10,6 +10,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import AllDatasets from './pages/DatasetPage/AllDatasetsPage'
 import AllProjects from './pages/ProjectPage/AllProjectsPage'
 import AllPatients from './pages/PatientPage/AllPatientsPage'
+import AllSamples from './pages/SamplePage/AllSamplesPage'
 
 import SingleDatasetPage from './pages/DatasetPage/SingleDatasetPage';
 import SinglePatientPage from './pages/PatientPage/SinglePatientPage';
@@ -61,8 +62,16 @@ function App() {
               <AllPatients/>
             </ProtectedRoute>
           }
-          />
-          <Route
+        />
+        <Route
+          path="/samples"
+          element={
+            <ProtectedRoute>
+              <AllSamples/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/visualizations"
           element={
             <ProtectedRoute>

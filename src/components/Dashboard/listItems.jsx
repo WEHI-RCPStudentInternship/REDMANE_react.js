@@ -54,6 +54,14 @@ export const mainListItems = () => {
                   <ListItemText primary="Patients" />
               </ListItemButton>
           </Tooltip>
+          <Tooltip title="Samples" placement="right">
+              <ListItemButton onClick={() => navigate('/samples')}>
+                  <ListItemIcon>
+                      <PeopleIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Samples" />
+              </ListItemButton>
+          </Tooltip>
           <Tooltip title="Visualizations" placement="right">
               <ListItemButton onClick={() => navigate('/visualizations')}>
                   <ListItemIcon>
