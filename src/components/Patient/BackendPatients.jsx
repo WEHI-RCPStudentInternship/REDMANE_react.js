@@ -208,7 +208,7 @@ export default function AllPatients(){
                       variant="contained"
                       color="primary"
                       size="small"
-                      href={BASE_URL+'/download/1/patients_metadata'}
+                      href={BASE_URL+'/download/patients_metadata/'+projectId}
                       rel="noopener noreferrer"
                     >
                       Download Patient Metadata
