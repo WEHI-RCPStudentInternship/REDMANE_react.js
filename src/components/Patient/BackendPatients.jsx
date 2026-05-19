@@ -202,7 +202,18 @@ export default function AllPatients(){
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Title>Patients</Title>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Title>Patients</Title>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="small"
+                      href={BASE_URL+'/download/1/patients_metadata'}
+                      rel="noopener noreferrer"
+                    >
+                      Download Patient Metadata
+                    </Button>
+                  </Box>
                   <Table size="large">
                     <TableHead>
                       <TableRow>
